@@ -9,7 +9,7 @@ import logging
 
 # ===== KONFIGURATSIYA =====
 TOKEN = "8691876539:AAHgkvaGOLd8YWdG3keyoFP1YjA8a0PyFrE"  # O'z tokeningizni qo'ying
-WEB_APP_URL = "https://github.com/shodiyor986/kafel/"  # GitHub Pages manzili
+WEB_APP_URL = "https://shodiyor986.github.io/kafel/"  # GitHub Pages manzili
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
