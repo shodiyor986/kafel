@@ -2,7 +2,6 @@
  * ============================================
  * KAFEL HISOB-KITOB ILOVASI
  * Telegram Web App uchun moslashtirilgan
- * WebAppDataInvalid xatosi tuzatildi
  * ============================================
  */
 
@@ -17,7 +16,7 @@ try {
         tg.expand();
         isTelegram = true;
         console.log('✅ Telegram Web App ulandi!');
-        
+
         // Telegram tema ranglarini qo'llash
         document.documentElement.style.setProperty('--tg-theme-bg-color', tg.backgroundColor || '#f0f4f8');
         document.documentElement.style.setProperty('--tg-theme-text-color', tg.textColor || '#0f172a');
@@ -25,7 +24,8 @@ try {
         document.documentElement.style.setProperty('--tg-theme-link-color', tg.linkColor || '#3b82f6');
         document.documentElement.style.setProperty('--tg-theme-button-color', tg.buttonColor || '#3b82f6');
         document.documentElement.style.setProperty('--tg-theme-button-text-color', tg.buttonTextColor || '#ffffff');
-        document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', tg.secondaryBackgroundColor || '#ffffff');
+        document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', tg.secondaryBackgroundColor ||
+            '#ffffff');
         document.documentElement.style.setProperty('--tg-theme-header-bg-color', tg.headerBackgroundColor || '#0f172a');
         document.documentElement.style.setProperty('--tg-theme-separator-color', tg.separatorColor || '#e2e8f0');
     }
@@ -36,7 +36,7 @@ try {
 // ====== 1. STEKIR (KVADRAT) HISOBLASH ======
 function calculateSquare() {
     const price = parseFloat(document.getElementById('squarePrice').value) || 0;
-    
+
     const walls = ['top', 'right', 'left', 'bottom', 'side'];
     const wallNames = {
         top: 'YUQORI',
@@ -52,15 +52,17 @@ function calculateSquare() {
         bottom: '⬇',
         side: '↔'
     };
-    
+
     let totalArea = 0;
     let allDetails = [];
-    
+
     walls.forEach(wall => {
-        const length = parseFloat(document.querySelector(`.wall-input[data-wall="${wall}"][data-type="length"]`).value) || 0;
-        const height = parseFloat(document.querySelector(`.wall-input[data-wall="${wall}"][data-type="height"]`).value) || 0;
+        const length = parseFloat(document.querySelector(`.wall-input[data-wall="${wall}"][data-type="length"]`)
+            .value) || 0;
+        const height = parseFloat(document.querySelector(`.wall-input[data-wall="${wall}"][data-type="height"]`)
+            .value) || 0;
         const area = length * height;
-        
+
         if (area > 0) {
             totalArea += area;
             allDetails.push({
@@ -74,16 +76,16 @@ function calculateSquare() {
             });
         }
     });
-    
+
     const extraWalls = document.querySelectorAll('.extra-wall');
     extraWalls.forEach((wall) => {
         const select = wall.querySelector('.extra-wall-selector');
         const selectedText = select ? select.options[select.selectedIndex]?.text || 'Qo\'shimcha' : 'Qo\'shimcha';
-        
+
         const length = parseFloat(wall.querySelector('.extra-length').value) || 0;
         const height = parseFloat(wall.querySelector('.extra-height').value) || 0;
         const area = length * height;
-        
+
         if (area > 0) {
             totalArea += area;
             allDetails.push({
@@ -97,12 +99,12 @@ function calculateSquare() {
             });
         }
     });
-    
+
     const totalPrice = totalArea * price;
-    
+
     document.getElementById('squareAreaResult').textContent = totalArea.toFixed(2) + ' m²';
     document.getElementById('squarePriceResult').textContent = totalPrice.toLocaleString('uz-UZ') + ' so\'m';
-    
+
     let detailsHTML = '';
     if (allDetails.length === 0) {
         detailsHTML = '<div style="color: #94a3b8; font-size: 12px;">Hech qanday o\'lcham kiritilmagan</div>';
@@ -117,7 +119,7 @@ function calculateSquare() {
         });
     }
     document.getElementById('squareDetails').innerHTML = detailsHTML;
-    
+
     return {
         area: totalArea,
         total: totalPrice,
@@ -152,13 +154,13 @@ function addExtraWall() {
         <button class="btn-remove-row" onclick="removeExtraWall(this)">✖</button>
     `;
     container.appendChild(div);
-    
+
     const inputs = div.querySelectorAll('input, select');
     inputs.forEach(input => {
         input.addEventListener('input', calculateAll);
         input.addEventListener('change', calculateAll);
     });
-    
+
     calculateAll();
 }
 
@@ -177,13 +179,13 @@ function addGradusRow() {
         <button class="btn-remove-row" onclick="removeGradusRow(this)">✖</button>
     `;
     container.appendChild(div);
-    
+
     const inputs = div.querySelectorAll('input');
     inputs.forEach(input => {
         input.addEventListener('input', calculateAll);
         input.addEventListener('change', calculateAll);
     });
-    
+
     calculateAll();
 }
 
@@ -200,10 +202,10 @@ function removeGradusRow(btn) {
 function calculateGradus() {
     const price = parseFloat(document.getElementById('gradusPrice').value) || 0;
     const inputs = document.querySelectorAll('.gradus-meter-input');
-    
+
     let totalMeter = 0;
     let details = [];
-    
+
     inputs.forEach((input, index) => {
         const meter = parseFloat(input.value) || 0;
         totalMeter += meter;
@@ -217,13 +219,13 @@ function calculateGradus() {
             });
         }
     });
-    
+
     const totalTiles = totalMeter * 2;
     const totalPrice = totalMeter * price * 2;
-    
+
     document.getElementById('gradusTiles').textContent = totalTiles.toFixed(1) + ' ta';
     document.getElementById('gradusPriceResult').textContent = totalPrice.toLocaleString('uz-UZ') + ' so\'m';
-    
+
     return {
         meter: totalMeter,
         tiles: totalTiles,
@@ -234,7 +236,8 @@ function calculateGradus() {
 
 // ====== 4. LISTENERLAR ======
 function addListeners() {
-    const inputs = document.querySelectorAll('.wall-input, .extra-length, .extra-height, .gradus-meter-input, .extra-wall-selector');
+    const inputs = document.querySelectorAll(
+        '.wall-input, .extra-length, .extra-height, .gradus-meter-input, .extra-wall-selector');
     inputs.forEach(input => {
         input.addEventListener('input', calculateAll);
         input.addEventListener('change', calculateAll);
@@ -246,11 +249,11 @@ function calculateAll() {
     const square = calculateSquare();
     const gradus = calculateGradus();
     const grand = square.total + gradus.total;
-    
+
     document.getElementById('totalSquare').textContent = square.total.toLocaleString('uz-UZ') + ' so\'m';
     document.getElementById('totalGradus').textContent = gradus.total.toLocaleString('uz-UZ') + ' so\'m';
     document.getElementById('totalGrand').textContent = grand.toLocaleString('uz-UZ') + ' so\'m';
-    
+
     updateReceipt(square, gradus, grand);
 }
 
@@ -266,12 +269,12 @@ function updateReceipt(square, gradus, grand) {
         hour: '2-digit',
         minute: '2-digit'
     });
-    
+
     document.getElementById('receiptDate').textContent = dateStr;
     document.getElementById('receiptTime').textContent = timeStr;
-    
+
     let squareHTML = '<h4>📐 1. Kvadrat hisoblash:</h4>';
-    
+
     if (square.details.length === 0) {
         squareHTML += '<div class="receipt-item" style="color:#94a3b8;">Ma\'lumot kiritilmagan</div>';
     } else {
@@ -285,10 +288,10 @@ function updateReceipt(square, gradus, grand) {
             `;
         });
     }
-    
+
     squareHTML += `<div class="receipt-total-small">JAMI: ${square.total.toLocaleString('uz-UZ')} so'm</div>`;
     document.getElementById('receiptSquare').innerHTML = squareHTML;
-    
+
     let gradusDetailsHTML = '';
     if (gradus.details.length === 0) {
         gradusDetailsHTML += '<div class="receipt-item" style="color:#94a3b8;">Ma\'lumot kiritilmagan</div>';
@@ -301,11 +304,11 @@ function updateReceipt(square, gradus, grand) {
             `;
         });
     }
-    
+
     document.getElementById('gradusReceiptDetails').innerHTML = gradusDetailsHTML;
-    document.getElementById('gradusReceiptTotal').textContent = 
+    document.getElementById('gradusReceiptTotal').textContent =
         'JAMI: ' + gradus.total.toLocaleString('uz-UZ') + ' so\'m';
-    
+
     document.getElementById('receiptGrandTotal').textContent = grand.toLocaleString('uz-UZ') + ' so\'m';
     document.getElementById('receipt').style.display = 'block';
 }
@@ -313,15 +316,14 @@ function updateReceipt(square, gradus, grand) {
 // ====== 7. PNG YUKLAB OLISH ======
 function downloadPNG() {
     calculateAll();
-    
+
     const receiptEl = document.getElementById('receipt');
-    
-    // Kvitansiya ko'rinishini tekshirish
+
     if (receiptEl.style.display === 'none') {
         alert('Iltimos, avval hisob-kitobni bajaring!');
         return;
     }
-    
+
     html2canvas(receiptEl, {
         scale: 2,
         backgroundColor: '#ffffff',
@@ -331,7 +333,6 @@ function downloadPNG() {
         borderRadius: '16px',
         padding: 16
     }).then((canvas) => {
-        // PNG ni yuklab olish
         const link = document.createElement('a');
         const now = new Date();
         const dateStr = now.toISOString().slice(0, 10);
@@ -340,61 +341,52 @@ function downloadPNG() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        
-        // Telegramga yuborish (agar ulangan bo'lsa)
+
         if (isTelegram && tg) {
             try {
-                // Rasmni base64 ga aylantirish (kichraytirilgan)
                 const dataUrl = canvas.toDataURL('image/png', 0.8);
-                
-                // Ma'lumotlarni tayyorlash
                 const data = {
                     type: 'receipt',
                     image: dataUrl,
                     date: dateStr,
                     total: document.getElementById('receiptGrandTotal').textContent
                 };
-                
-                // Telegramga yuborish
                 tg.sendData(JSON.stringify(data));
                 console.log('✅ Telegramga yuborildi!');
             } catch (e) {
                 console.error('❌ Telegramga yuborishda xatolik:', e);
-                // Xatolikni ko'rsatma, faqat yuklab olish ishladi
             }
         }
-        
+
     }).catch(function(err) {
         console.error('PNG yaratishda xatolik:', err);
         alert('PNG yaratishda xatolik:\n' + err.message);
     });
 }
 
-// ====== 8. TELEGRAMGA YUBORISH (TAKOMILLASHTIRILGAN) ======
+// ====== 8. TELEGRAMGA YUBORISH ======
 function sendToTelegram() {
     if (!isTelegram || !tg) {
-        alert('⚠️ Telegram Web App ulanishi topilmadi!\n\n'
-            + 'Iltimos, bot orqali oching yoki\n'
-            + '"PNG yuklab olish" tugmasidan foydalaning.');
+        alert('⚠️ Telegram Web App ulanishi topilmadi!\n\n' +
+            'Iltimos, bot orqali oching yoki\n' +
+            '"PNG yuklab olish" tugmasidan foydalaning.');
         return;
     }
-    
+
     calculateAll();
-    
+
     const receiptEl = document.getElementById('receipt');
-    
-    // Kvitansiya ko'rinishini tekshirish
+
     if (receiptEl.style.display === 'none') {
         alert('Iltimos, avval hisob-kitobni bajaring!');
         return;
     }
-    
-    // Yuklanayotganini ko'rsatish
+
     const btn = document.querySelector('.btn-telegram');
     const originalText = btn.textContent;
     btn.textContent = '⏳ Yuborilmoqda...';
     btn.disabled = true;
-    
+
     html2canvas(receiptEl, {
         scale: 1.8,
         backgroundColor: '#ffffff',
@@ -405,39 +397,32 @@ function sendToTelegram() {
         padding: 16
     }).then((canvas) => {
         try {
-            // Rasmni base64 ga aylantirish (optimallashtirilgan)
             const dataUrl = canvas.toDataURL('image/png', 0.7);
-            
-            // Ma'lumotlarni tayyorlash
             const now = new Date();
             const dateStr = now.toISOString().slice(0, 10);
-            
+
             const data = {
                 type: 'receipt',
                 image: dataUrl,
                 date: dateStr,
                 total: document.getElementById('receiptGrandTotal').textContent
             };
-            
-            // Telegramga yuborish
+
             tg.sendData(JSON.stringify(data));
-            
-            // Muvaffaqiyatli yuborildi
             tg.showAlert('✅ Kvitansiya muvaffaqiyatli yuborildi!');
-            
+
         } catch (e) {
             console.error('❌ Yuborishda xatolik:', e);
             tg.showAlert('❌ Yuborishda xatolik: ' + e.message);
         }
-        
-        // Tugmani qayta tiklash
+
         btn.textContent = originalText;
         btn.disabled = false;
-        
+
     }).catch(function(err) {
         console.error('PNG yaratishda xatolik:', err);
         alert('PNG yaratishda xatolik:\n' + err.message);
-        
+
         btn.textContent = originalText;
         btn.disabled = false;
     });
@@ -446,14 +431,14 @@ function sendToTelegram() {
 // ====== 9. BOSHLASH ======
 document.addEventListener('DOMContentLoaded', function() {
     addListeners();
-    
+
     document.getElementById('squarePrice').addEventListener('input', calculateAll);
     document.getElementById('squarePrice').addEventListener('change', calculateAll);
     document.getElementById('gradusPrice').addEventListener('input', calculateAll);
     document.getElementById('gradusPrice').addEventListener('change', calculateAll);
-    
+
     calculateAll();
-    
+
     console.log('✅ Kafel hisob-kitobi ilovasi ishga tushdi!');
     console.log('📱 Telegram Web App: ' + (isTelegram ? '✅ Ulangan' : '❌ Ulanish yo\'q'));
 });
@@ -467,7 +452,6 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Telegram dan kelgan xabarlarni qabul qilish
 window.addEventListener('message', function(event) {
     try {
         const data = JSON.parse(event.data);
