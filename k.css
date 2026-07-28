@@ -191,11 +191,26 @@ body {
     outline: none;
 }
 
-.wall-top { grid-column: 1 / 4; grid-row: 1; }
-.wall-side { grid-column: 1; grid-row: 2; }
-.wall-left { grid-column: 2; grid-row: 2; }
-.wall-right { grid-column: 3; grid-row: 2; }
-.wall-bottom { grid-column: 2; grid-row: 3; }
+.wall-top {
+    grid-column: 1 / 4;
+    grid-row: 1;
+}
+.wall-side {
+    grid-column: 1;
+    grid-row: 2;
+}
+.wall-left {
+    grid-column: 2;
+    grid-row: 2;
+}
+.wall-right {
+    grid-column: 3;
+    grid-row: 2;
+}
+.wall-bottom {
+    grid-column: 2;
+    grid-row: 3;
+}
 
 /* ===== QO'SHIMCHA DEVORLAR ===== */
 #extraWallsContainer {
@@ -505,9 +520,15 @@ body {
     flex-shrink: 0;
 }
 
-.dot.red { background: #ef4444; }
-.dot.blue { background: #3b82f6; }
-.dot.green { background: #22c55e; }
+.dot.red {
+    background: #ef4444;
+}
+.dot.blue {
+    background: #3b82f6;
+}
+.dot.green {
+    background: #22c55e;
+}
 
 .tile-result {
     display: grid;
