@@ -8,7 +8,7 @@ from PIL import Image
 import logging
 
 # ===== KONFIGURATSIYA =====
-TOKEN = "YOUR_BOT_TOKEN"  # O'z tokeningizni qo'ying
+TOKEN = "8691876539:AAHgkvaGOLd8YWdG3keyoFP1YjA8a0PyFrE"  # O'z tokeningizni qo'ying
 WEB_APP_URL = "https://YOUR_GITHUB_USERNAME.github.io/REPO_NAME/"  # GitHub Pages manzili
 
 logging.basicConfig(
