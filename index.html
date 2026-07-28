@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Kafel Hisob-kitobi</title>
+    
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
     <link rel="stylesheet" href="k.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
     </script>
@@ -18,9 +22,7 @@
 
         <main class="main">
 
-            <!-- ========================================= -->
             <!-- ===== 1. KVADRAT HESOBLASH ===== -->
-            <!-- ========================================= -->
             <section class="card card-square">
                 <div class="card-header">
                     <span class="icon">📐</span>
@@ -28,16 +30,14 @@
                 </div>
 
                 <div class="card-body">
-                    <!-- Narx -->
                     <div class="input-group">
                         <label>💰 1 m² narxi (so'm)</label>
                         <input type="number" id="squarePrice" value="120000" step="1000" min="0" />
                     </div>
 
-                    <!-- ===== ASOSIY 5 TOMON ===== -->
+                    <!-- 3D XONA -->
                     <div class="room-container">
                         <div class="room-3d">
-                            <!-- YUQORI -->
                             <div class="wall wall-top">
                                 <div class="wall-label">⬆ YUQORI</div>
                                 <div class="wall-inputs">
@@ -51,8 +51,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- O'NG -->
                             <div class="wall wall-right">
                                 <div class="wall-label">➡ O'NG</div>
                                 <div class="wall-inputs">
@@ -66,8 +64,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- PAST -->
                             <div class="wall wall-bottom">
                                 <div class="wall-label">⬇ PAST</div>
                                 <div class="wall-inputs">
@@ -81,8 +77,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- CHAP -->
                             <div class="wall wall-left">
                                 <div class="wall-label">⬅ CHAP</div>
                                 <div class="wall-inputs">
@@ -96,8 +90,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- YON -->
                             <div class="wall wall-side">
                                 <div class="wall-label">↔ YON</div>
                                 <div class="wall-inputs">
@@ -114,11 +106,9 @@
                         </div>
                     </div>
 
-                    <!-- ===== QO'SHIMCHA DEVORLAR (TANLASH BILAN) ===== -->
                     <button class="btn-add-row" onclick="addExtraWall()">➕ Qo'shimcha devor qo'shish</button>
                     <div id="extraWallsContainer"></div>
 
-                    <!-- Natija -->
                     <div class="result-preview">
                         <div class="result-item">
                             <span>📐 Umumiy maydon:</span>
@@ -134,9 +124,7 @@
                 </div>
             </section>
 
-            <!-- ========================================= -->
-            <!-- ===== 2. 45 GRADUS HESOBLASH ===== -->
-            <!-- ========================================= -->
+            <!-- ===== 2. 45 GRADUS ===== -->
             <section class="card card-45">
                 <div class="card-header">
                     <span class="icon">🔶</span>
@@ -161,10 +149,8 @@
                         <button class="btn-add-row" onclick="addGradusRow()">➕ Qator qo'shish</button>
                     </div>
 
-                    <!-- 45° VIZUAL -->
                     <div class="visual-45">
                         <h4>🔍 45° kesish va yopishtirish</h4>
-
                         <div class="tile-diagram">
                             <div class="tile-box">
                                 <div class="tile tile-1">
@@ -176,14 +162,12 @@
                                     <div class="cut-line"></div>
                                 </div>
                             </div>
-
                             <div class="tile-explanation">
                                 <p><span class="dot red"></span> 1-kafel 45° kesiladi</p>
                                 <p><span class="dot blue"></span> 2-kafel 45° kesiladi</p>
                                 <p><span class="dot green"></span> 1 metr = 2 ta kafel</p>
                             </div>
                         </div>
-
                         <div class="tile-result">
                             <div class="result-item">
                                 <span>🔪 Kesiladigan kafel:</span>
@@ -198,15 +182,12 @@
                 </div>
             </section>
 
-            <!-- ========================================= -->
             <!-- ===== 3. UMUMIY JAMI ===== -->
-            <!-- ========================================= -->
             <section class="card card-total">
                 <div class="card-header">
                     <span class="icon">💎</span>
                     <h2>Umumiy hisob</h2>
                 </div>
-
                 <div class="card-body">
                     <div class="total-grid">
                         <div class="total-item">
@@ -225,21 +206,16 @@
                 </div>
             </section>
 
-            <!-- ========================================= -->
             <!-- ===== 4. KVITANSIYA ===== -->
-            <!-- ========================================= -->
             <div id="receipt">
                 <div class="receipt-header">
                     <h2>🧾 Kvitansiya</h2>
                     <span id="receiptDate"></span>
                 </div>
-
                 <div id="receiptContent">
                     <div id="receiptSquare"></div>
-
                     <div id="receiptGradus">
                         <h4>🔶 2. 45° gradus hisoblash:</h4>
-                        
                         <div class="receipt-diagram">
                             <div class="receipt-tile-box">
                                 <div class="receipt-tile receipt-tile-1">
@@ -257,27 +233,29 @@
                                 <p><span class="dot green"></span> 1 metr = 2 ta kafel</p>
                             </div>
                         </div>
-
                         <div id="gradusReceiptDetails"></div>
                         <div class="receipt-total-small" id="gradusReceiptTotal">JAMI: 0 so'm</div>
                     </div>
-
                     <div class="receipt-grand">
                         <span>💎 UMUMIY JAMI:</span>
                         <strong id="receiptGrandTotal">0 so'm</strong>
                     </div>
                 </div>
-
                 <div class="receipt-footer">
                     <span>🕒 Sana: <span id="receiptTime"></span></span>
                 </div>
             </div>
 
+            <!-- ===== YUKLASH TUGMALARI ===== -->
             <button class="btn btn-download" onclick="downloadPNG()">
                 ⬇️ PNG kvitansiyani yuklab olish
             </button>
+            
+            <button class="btn btn-telegram" onclick="sendToTelegram()" style="margin-top:10px; background: linear-gradient(135deg, #0088cc 0%, #006699 100%);">
+                📤 Telegramga yuborish
+            </button>
 
-            <p class="footer-note">* PNG fayl qurilmangizga saqlanadi. Uni uy egasiga yuboring.</p>
+            <p class="footer-note">* PNG fayl qurilmangizga saqlanadi. Telegramga yuborish uchun botga ulangan bo'lishi kerak.</p>
 
         </main>
     </div>
