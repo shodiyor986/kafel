@@ -1,15 +1,27 @@
 /**
  * ============================================
  * KAFEL HISOB-KITOB ILOVASI
- * Qo'shimcha devorlarda tanlash funksiyasi
+ * Telegram Web App uchun moslashtirilgan
  * ============================================
  */
+
+// Telegram Web App
+let tg = null;
+try {
+    tg = window.Telegram?.WebApp;
+    if (tg) {
+        tg.ready();
+        tg.expand();
+        console.log('✅ Telegram Web App ulandi!');
+    }
+} catch (e) {
+    console.log('⚠️ Telegram Web App mavjud emas');
+}
 
 // ====== 1. STEKIR (KVADRAT) HISOBLASH ======
 function calculateSquare() {
     const price = parseFloat(document.getElementById('squarePrice').value) || 0;
     
-    // Asosiy 5 tomon
     const walls = ['top', 'right', 'left', 'bottom', 'side'];
     const wallNames = {
         top: 'YUQORI',
@@ -17,13 +29,6 @@ function calculateSquare() {
         left: 'CHAP',
         bottom: 'PAST',
         side: 'YON'
-    };
-    const wallColors = {
-        top: '#3b82f6',
-        right: '#22c55e',
-        left: '#eab308',
-        bottom: '#8b5cf6',
-        side: '#ef4444'
     };
     const wallIcons = {
         top: '⬆',
@@ -36,7 +41,6 @@ function calculateSquare() {
     let totalArea = 0;
     let allDetails = [];
     
-    // Asosiy tomonlarni hisoblash
     walls.forEach(wall => {
         const length = parseFloat(document.querySelector(`.wall-input[data-wall="${wall}"][data-type="length"]`).value) || 0;
         const height = parseFloat(document.querySelector(`.wall-input[data-wall="${wall}"][data-type="height"]`).value) || 0;
@@ -47,7 +51,6 @@ function calculateSquare() {
             allDetails.push({
                 label: wallNames[wall],
                 icon: wallIcons[wall],
-                color: wallColors[wall],
                 length: length,
                 height: height,
                 area: area,
@@ -57,12 +60,10 @@ function calculateSquare() {
         }
     });
     
-    // Qo'shimcha devorlarni hisoblash
     const extraWalls = document.querySelectorAll('.extra-wall');
     extraWalls.forEach((wall) => {
         const select = wall.querySelector('.extra-wall-selector');
         const selectedText = select ? select.options[select.selectedIndex]?.text || 'Qo\'shimcha' : 'Qo\'shimcha';
-        const selectedValue = select ? select.value : 'extra';
         
         const length = parseFloat(wall.querySelector('.extra-length').value) || 0;
         const height = parseFloat(wall.querySelector('.extra-height').value) || 0;
@@ -73,13 +74,11 @@ function calculateSquare() {
             allDetails.push({
                 label: selectedText,
                 icon: '',
-                color: '#94a3b8',
                 length: length,
                 height: height,
                 area: area,
                 price: area * price,
-                isExtra: true,
-                value: selectedValue
+                isExtra: true
             });
         }
     });
@@ -91,16 +90,12 @@ function calculateSquare() {
     
     let detailsHTML = '';
     if (allDetails.length === 0) {
-        detailsHTML = '<div style="color: #94a3b8; font-size: 13px;">Hech qanday o\'lcham kiritilmagan</div>';
+        detailsHTML = '<div style="color: #94a3b8; font-size: 12px;">Hech qanday o\'lcham kiritilmagan</div>';
     } else {
         allDetails.forEach(item => {
-            const colorStyle = item.color ? `style="color: ${item.color};"` : '';
             detailsHTML += `
                 <div class="detail-item">
-                    <span class="detail-label" ${colorStyle}>
-                        ${item.icon} ${item.label}: ${item.length} × ${item.height} = ${item.area.toFixed(2)} m²
-                        ${item.isExtra ? '📌' : ''}
-                    </span>
+                    <span class="detail-label">${item.icon} ${item.label}${item.isExtra ? ' 📌' : ''}: ${item.length} × ${item.height} = ${item.area.toFixed(2)} m²</span>
                     <span class="detail-value">${item.price.toLocaleString('uz-UZ')} so'm</span>
                 </div>
             `;
@@ -115,7 +110,7 @@ function calculateSquare() {
     };
 }
 
-// ====== 2. QO'SHIMCHA DEVOR QO'SHISH (TANLASH BILAN) ======
+// ====== 2. QO'SHIMCHA DEVOR ======
 function addExtraWall() {
     const container = document.getElementById('extraWallsContainer');
     const div = document.createElement('div');
@@ -300,7 +295,7 @@ function updateReceipt(square, gradus, grand) {
     document.getElementById('receipt').style.display = 'block';
 }
 
-// ====== 7. PNG YUKLASH ======
+// ====== 7. PNG YUKLAB OLISH (TELEGRAM UCHUN MOS) ======
 function downloadPNG() {
     calculateAll();
     
@@ -312,9 +307,10 @@ function downloadPNG() {
         allowTaint: false,
         useCORS: true,
         logging: false,
-        borderRadius: '18px',
+        borderRadius: '16px',
         padding: 16
     }).then((canvas) => {
+        // PNG ni yuklab olish
         const link = document.createElement('a');
         const now = new Date();
         const dateStr = now.toISOString().slice(0, 10);
@@ -323,12 +319,62 @@ function downloadPNG() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        
+        // Telegram ga yuborish
+        if (tg) {
+            const dataUrl = canvas.toDataURL('image/png');
+            tg.sendData(JSON.stringify({
+                type: 'receipt',
+                image: dataUrl,
+                date: dateStr,
+                total: document.getElementById('receiptGrandTotal').textContent
+            }));
+        }
+        
     }).catch(function(err) {
         alert('PNG yaratishda xatolik:\n' + err.message);
     });
 }
 
-// ====== 8. BOSHLASH ======
+// ====== 8. TELEGRAMGA YUBORISH ======
+function sendToTelegram() {
+    if (!tg) {
+        alert('Telegram Web App ulanishi topilmadi!\nIltimos, bot orqali oching.');
+        return;
+    }
+    
+    calculateAll();
+    
+    const receiptEl = document.getElementById('receipt');
+    
+    html2canvas(receiptEl, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        allowTaint: false,
+        useCORS: true,
+        logging: false,
+        borderRadius: '16px',
+        padding: 16
+    }).then((canvas) => {
+        const dataUrl = canvas.toDataURL('image/png');
+        const now = new Date();
+        const dateStr = now.toISOString().slice(0, 10);
+        
+        tg.sendData(JSON.stringify({
+            type: 'receipt',
+            image: dataUrl,
+            date: dateStr,
+            total: document.getElementById('receiptGrandTotal').textContent
+        }));
+        
+        tg.showAlert('✅ Kvitansiya Telegramga yuborildi!');
+        
+    }).catch(function(err) {
+        alert('Yuborishda xatolik:\n' + err.message);
+    });
+}
+
+// ====== 9. BOSHLASH ======
 document.addEventListener('DOMContentLoaded', function() {
     addListeners();
     
@@ -338,6 +384,19 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('gradusPrice').addEventListener('change', calculateAll);
     
     calculateAll();
+    
+    // Telegram theme
+    if (tg) {
+        document.documentElement.style.setProperty('--tg-theme-bg-color', tg.backgroundColor || '#f0f4f8');
+        document.documentElement.style.setProperty('--tg-theme-text-color', tg.textColor || '#0f172a');
+        document.documentElement.style.setProperty('--tg-theme-hint-color', tg.hintColor || '#64748b');
+        document.documentElement.style.setProperty('--tg-theme-link-color', tg.linkColor || '#3b82f6');
+        document.documentElement.style.setProperty('--tg-theme-button-color', tg.buttonColor || '#3b82f6');
+        document.documentElement.style.setProperty('--tg-theme-button-text-color', tg.buttonTextColor || '#ffffff');
+        document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', tg.secondaryBackgroundColor || '#ffffff');
+        document.documentElement.style.setProperty('--tg-theme-header-bg-color', tg.headerBackgroundColor || '#0f172a');
+        document.documentElement.style.setProperty('--tg-theme-separator-color', tg.separatorColor || '#e2e8f0');
+    }
 });
 
 document.addEventListener('keydown', function(e) {
@@ -350,6 +409,4 @@ document.addEventListener('keydown', function(e) {
 });
 
 console.log('✅ Kafel hisob-kitobi ilovasi ishga tushdi!');
-console.log('🏠 3D xona ko\'rinishi (YUQORI, PAST, YON, CHAP, O\'NG)');
-console.log('📋 Qo\'shimcha devorda tanlash funksiyasi mavjud!');
-console.log('📱 Mobil qurilmalarga moslashtirilgan!');
+console.log('📱 Telegram Web App uchun moslashtirilgan!');
