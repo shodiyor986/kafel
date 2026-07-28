@@ -1,20 +1,22 @@
 import os
 import json
 import base64
-from io import BytesIO
+import io
+import logging
+from datetime import datetime
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 from PIL import Image
-import logging
 
 # ===== KONFIGURATSIYA =====
 TOKEN = "8691876539:AAHgkvaGOLd8YWdG3keyoFP1YjA8a0PyFrE"  # O'z tokeningizni qo'ying
-WEB_APP_URL = "https://shodiyor986.github.io/kafel/"  # GitHub Pages manzili
+WEB_APP_URL = "https://shodiyor986.github.io/kafel/"   # GitHub Pages manzili
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
+logger = logging.getLogger(__name__)
 
 # ===== BOT KOMANDALARI =====
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -33,75 +35,54 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         f"👋 Assalomu alaykum, {user.first_name}!\n\n"
         f"🏠 Uy egasi uchun kafel hisob-kitobi ilovasiga xush kelibsiz.\n\n"
-        f"📐 Quyidagi tugmani bosing va hisob-kitobni boshlang:",
-        reply_markup=reply_markup
+        f"📐 Quyidagi tugmani bosing va hisob-kitobni boshlang:\n\n"
+        f"📌 *Eslatma:* Hisob-kitob tugagach, 'Telegramga yuborish' tugmasini bosing.",
+        reply_markup=reply_markup,
+        parse_mode='Markdown'
     )
 
 async def handle_web_app_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Web App dan kelgan ma'lumotlarni qabul qilish"""
-    data = update.effective_message.web_app_data
-    
-    if data and data.data:
-        try:
-            # JSON ma'lumotni o'qish
-            json_data = json.loads(data.data)
+    try:
+        data = update.effective_message.web_app_data
+        
+        if not data or not data.data:
+            await update.message.reply_text("❌ Ma'lumot topilmadi!")
+            return
+        
+        # JSON ma'lumotni o'qish
+        json_data = json.loads(data.data)
+        logger.info(f"📨 Ma'lumot olindi: {json_data.get('type')}")
+        
+        if json_data.get('type') == 'receipt':
+            # Rasm ma'lumotlarini olish
+            image_data = json_data.get('image', '')
+            if not image_data:
+                await update.message.reply_text("❌ Rasm ma'lumotlari topilmadi!")
+                return
             
-            if json_data.get('type') == 'receipt':
-                # Rasmni saqlash
-                image_data = json_data.get('image', '').split(',')[1]
+            # Base64 dan rasmni olish
+            if image_data.startswith('data:image/png;base64,'):
+                image_data = image_data.replace('data:image/png;base64,', '')
+            
+            try:
+                # Rasmni dekod qilish
                 image_bytes = base64.b64decode(image_data)
+                image = Image.open(io.BytesIO(image_bytes))
                 
-                # Rasmni faylga saqlash
-                filename = f"kvitansiya_{json_data.get('date', 'now')}.png"
-                with open(filename, 'wb') as f:
-                    f.write(image_bytes)
+                # Rasmni saqlash
+                date_str = json_data.get('date', datetime.now().strftime('%Y-%m-%d'))
+                filename = f"kvitansiya_{date_str}.png"
+                
+                # Rasmni saqlash
+                image.save(filename, 'PNG', quality=95)
+                logger.info(f"✅ Rasm saqlandi: {filename}")
                 
                 # Foydalanuvchiga yuborish
                 with open(filename, 'rb') as f:
                     await update.message.reply_photo(
                         photo=f,
-                        caption=f"🧾 Kvitansiya\n"
+                        caption=f"🧾 *Kvitansiya*\n\n"
                                f"📅 Sana: {json_data.get('date', 'N/A')}\n"
                                f"💰 Jami: {json_data.get('total', '0')}\n\n"
-                               f"✅ Hisob-kitob muvaffaqiyatli bajarildi!"
-                    )
-                
-                # Faylni o'chirish
-                os.remove(filename)
-                
-        except Exception as e:
-            await update.message.reply_text(f"❌ Xatolik yuz berdi: {str(e)}")
-    else:
-        await update.message.reply_text("❌ Ma'lumot topilmadi!")
-
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Yordam komandasi"""
-    await update.message.reply_text(
-        "📖 Yordam:\n\n"
-        "1. 'Kafel Hisob-kitobi' tugmasini bosing\n"
-        "2. Devor o'lchamlarini kiriting\n"
-        "3. 45° gradus uchun metrlarni kiriting\n"
-        "4. 'PNG yuklab olish' tugmasini bosing\n"
-        "5. Kvitansiya avtomatik yuboriladi\n\n"
-        "📱 Telegram orqali to'liq ishlaydi!"
-    )
-
-# ===== BOTNI ISHGA TUSHIRISH =====
-def main():
-    app = Application.builder().token(TOKEN).build()
-    
-    # Komandalar
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("help", help_command))
-    
-    # Web App ma'lumotlarini qabul qilish
-    app.add_handler(MessageHandler(
-        filters.StatusUpdate.WEB_APP_DATA, 
-        handle_web_app_data
-    ))
-    
-    print("🤖 Bot ishga tushdi...")
-    app.run_polling(allowed_updates=Update.ALL_TYPES)
-
-if __name__ == "__main__":
-    main()
+                               f"✅ Hisob-kitob muvaff
