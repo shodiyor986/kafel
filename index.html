@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Kafel Hisob-kitobi</title>
+    
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js">
+    </script>
+    
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
+    </script>
+</head>
+<body>
+    <div class="app">
+        <!-- ===== HEADER ===== -->
+        <header class="header">
+            <h1>🧱 KAFEL HISOBI</h1>
+            <p>🏠 Uy egasi uchun to'liq hisob-kitob</p>
+        </header>
+
+        <!-- ===== NAVIGATION TABS ===== -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="hisoblash" onclick="switchTab('hisoblash')">
+                📐 Hisoblash
+            </button>
+            <button class="tab-btn" data-tab="kalkulyator" onclick="switchTab('kalkulyator')">
+                🧮 Kalkulyator
+            </button>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 1. HISOBLASH BO'LIMI ===== -->
+        <!-- ============================================================ -->
+        <div id="tab-hisoblash" class="tab-content active">
+            
+            <!-- ===== 1.1. KVADRAT HESOBLASH ===== -->
+            <section class="card card-square">
+                <div class="card-header">
+                    <span class="icon">📐</span>
+                    <h2>Kvadrat hisoblash</h2>
+                </div>
+
+                <div class="card-body">
+                    <div class="input-group">
+                        <label>💰 1 m² narxi (so'm)</label>
+                        <input type="number" id="squarePrice" value="120000" step="1000" min="0" />
+                    </div>
+
+                    <div class="room-container">
+                        <div class="room-3d">
+                            <!-- YUQORI -->
+                            <div class="wall wall-top">
+                                <div class="wall-label">⬆ YUQORI</div>
+                                <div class="wall-inputs">
+                                    <div class="input-group-sm">
+                                        <label>Uzunlik</label>
+                                        <input type="number" class="wall-input" data-wall="top" data-type="length" value="0" step="0.1" min="0" />
+                                    </div>
+                                    <div class="input-group-sm">
+                                        <label>Balandlik</label>
+                                        <input type="number" class="wall-input" data-wall="top" data-type="height" value="0" step="0.1" min="0" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- O'NG -->
+                            <div class="wall wall-right">
+                                <div class="wall-label">➡ O'NG</div>
+                                <div class="wall-inputs">
+                                    <div class="input-group-sm">
+                                        <label>Uzunlik</label>
+                                        <input type="number" class="wall-input" data-wall="right" data-type="length" value="0" step="0.1" min="0" />
+                                    </div>
+                                    <div class="input-group-sm">
+                                        <label>Balandlik</label>
+                                        <input type="number" class="wall-input" data-wall="right" data-type="height" value="0" step="0.1" min="0" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PAST -->
+                            <div class="wall wall-bottom">
+                                <div class="wall-label">⬇ PAST</div>
+                                <div class="wall-inputs">
+                                    <div class="input-group-sm">
+                                        <label>Uzunlik</label>
+                                        <input type="number" class="wall-input" data-wall="bottom" data-type="length" value="0" step="0.1" min="0" />
+                                    </div>
+                                    <div class="input-group-sm">
+                                        <label>Balandlik</label>
+                                        <input type="number" class="wall-input" data-wall="bottom" data-type="height" value="0" step="0.1" min="0" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CHAP -->
+                            <div class="wall wall-left">
+                                <div class="wall-label">⬅ CHAP</div>
+                                <div class="wall-inputs">
+                                    <div class="input-group-sm">
+                                        <label>Uzunlik</label>
+                                        <input type="number" class="wall-input" data-wall="left" data-type="length" value="0" step="0.1" min="0" />
+                                    </div>
+                                    <div class="input-group-sm">
+                                        <label>Balandlik</label>
+                                        <input type="number" class="wall-input" data-wall="left" data-type="height" value="0" step="0.1" min="0" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- YON -->
+                            <div class="wall wall-side">
+                                <div class="wall-label">↔ YON</div>
+                                <div class="wall-inputs">
+                                    <div class="input-group-sm">
+                                        <label>Uzunlik</label>
+                                        <input type="number" class="wall-input" data-wall="side" data-type="length" value="0" step="0.1" min="0" />
+                                    </div>
+                                    <div class="input-group-sm">
+                                        <label>Balandlik</label>
+                                        <input type="number" class="wall-input" data-wall="side" data-type="height" value="0" step="0.1" min="0" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn-add-row" onclick="addExtraWall()">➕ Qo'shimcha devor qo'shish</button>
+                    <div id="extraWallsContainer"></div>
+
+                    <div class="result-preview">
+                        <div class="result-item">
+                            <span>📐 Umumiy maydon:</span>
+                            <strong id="squareAreaResult">0 m²</strong>
+                        </div>
+                        <div class="result-item">
+                            <span>💰 Umumiy narx:</span>
+                            <strong id="squarePriceResult">0 so'm</strong>
+                        </div>
+                    </div>
+
+                    <div id="squareDetails" class="square-details"></div>
+                </div>
+            </section>
+
+            <!-- ===== 1.2. 45 GRADUS / AVALNI ===== -->
+            <section class="card card-45">
+                <div class="card-header">
+                    <span class="icon">🔶</span>
+                    <h2>45° Gradus / Avalni hisoblash</h2>
+                </div>
+
+                <div class="card-body">
+                    <!-- ===== TANLASH: 45 GRADUS YOKI AVALNI ===== -->
+                    <div class="input-group">
+                        <label>📐 Hisoblash turi</label>
+                        <div class="btn-group gradus-type">
+                            <button class="btn-option active" data-type="gradus" onclick="setGradusType('gradus')">🔶 45° Gradus</button>
+                            <button class="btn-option" data-type="avalni" onclick="setGradusType('avalni')">🔷 Avalni (yon)</button>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>💰 1 metr uchun narx (so'm)</label>
+                        <input type="number" id="gradusPrice" value="15000" step="1000" min="0" />
+                        <small id="gradusInfo">⚠️ 1 metr = 2 ta kafel 45° kesiladi</small>
+                    </div>
+
+                    <div class="input-group">
+                        <label>📏 Metrlar (m)</label>
+                        <div id="gradusContainer">
+                            <div class="input-with-btn">
+                                <input type="number" class="gradus-meter-input" value="1" step="0.1" min="0" />
+                                <button class="btn-remove-row" onclick="removeGradusRow(this)">✖</button>
+                            </div>
+                        </div>
+                        <button class="btn-add-row" onclick="addGradusRow()">➕ Qator qo'shish</button>
+                    </div>
+
+                    <!-- 45° VIZUAL -->
+                    <div class="visual-45" id="visualContainer">
+                        <h4 id="visualTitle">🔍 45° kesish va yopishtirish</h4>
+                        <div class="tile-diagram" id="tileDiagram">
+                            <div class="tile-box" id="tileBox">
+                                <div class="tile tile-1">
+                                    <span>1</span>
+                                    <div class="cut-line"></div>
+                                </div>
+                                <div class="tile tile-2">
+                                    <span>2</span>
+                                    <div class="cut-line"></div>
+                                </div>
+                            </div>
+                            <div class="tile-explanation" id="tileExplanation">
+                                <p><span class="dot red"></span> 1-kafel 45° kesiladi</p>
+                                <p><span class="dot blue"></span> 2-kafel 45° kesiladi</p>
+                                <p><span class="dot green"></span> 1 metr = 2 ta kafel</p>
+                            </div>
+                        </div>
+                        <div class="tile-result">
+                            <div class="result-item">
+                                <span id="tilesLabel">🔪 Kesiladigan kafel:</span>
+                                <strong id="gradusTiles">0 ta</strong>
+                            </div>
+                            <div class="result-item">
+                                <span>💰 Narxi:</span>
+                                <strong id="gradusPriceResult">0 so'm</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== 1.3. UMUMIY JAMI ===== -->
+            <section class="card card-total">
+                <div class="card-header">
+                    <span class="icon">💎</span>
+                    <h2>Umumiy hisob</h2>
+                </div>
+                <div class="card-body">
+                    <div class="total-grid">
+                        <div class="total-item">
+                            <span>📐 Kvadrat:</span>
+                            <strong id="totalSquare">0 so'm</strong>
+                        </div>
+                        <div class="total-item">
+                            <span id="totalGradusLabel">🔶 45° gradus:</span>
+                            <strong id="totalGradus">0 so'm</strong>
+                        </div>
+                        <div class="total-item grand">
+                            <span>💎 JAMI:</span>
+                            <strong id="totalGrand">0 so'm</strong>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== 1.4. KVITANSIYA ===== -->
+            <div id="receipt">
+                <div class="receipt-header">
+                    <h2>🧾 Kvitansiya</h2>
+                    <span id="receiptDate"></span>
+                </div>
+                <div id="receiptContent">
+                    <div id="receiptSquare"></div>
+                    <div id="receiptGradus">
+                        <h4 id="receiptGradusTitle">🔶 2. 45° gradus hisoblash:</h4>
+                        <div class="receipt-diagram">
+                            <div class="receipt-tile-box">
+                                <div class="receipt-tile receipt-tile-1">
+                                    <span>1</span>
+                                    <div class="receipt-cut-line"></div>
+                                </div>
+                                <div class="receipt-tile receipt-tile-2">
+                                    <span>2</span>
+                                    <div class="receipt-cut-line"></div>
+                                </div>
+                            </div>
+                            <div class="receipt-tile-explanation" id="receiptExplanation">
+                                <p><span class="dot red"></span> 1-kafel 45° kesiladi</p>
+                                <p><span class="dot blue"></span> 2-kafel 45° kesiladi</p>
+                                <p><span class="dot green"></span> 1 metr = 2 ta kafel</p>
+                            </div>
+                        </div>
+                        <div id="gradusReceiptDetails"></div>
+                        <div class="receipt-total-small" id="gradusReceiptTotal">JAMI: 0 so'm</div>
+                    </div>
+                    <div class="receipt-grand">
+                        <span>💎 UMUMIY JAMI:</span>
+                        <strong id="receiptGrandTotal">0 so'm</strong>
+                    </div>
+                </div>
+                <div class="receipt-footer">
+                    <span>🕒 Sana: <span id="receiptTime"></span></span>
+                </div>
+            </div>
+
+            <button class="btn btn-download" onclick="downloadPNG()">
+                ⬇️ PNG kvitansiyani yuklab olish
+            </button>
+            <button class="btn btn-telegram" onclick="sendToTelegram()">
+                📤 Telegramga yuborish
+            </button>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ===== 2. KALKULYATOR BO'LIMI ===== -->
+        <!-- ============================================================ -->
+        <div id="tab-kalkulyator" class="tab-content">
+            <section class="card card-calculator">
+                <div class="card-header">
+                    <span class="icon">🧮</span>
+                    <h2>Kafel kalkulyatori</h2>
+                </div>
+
+                <div class="card-body">
+                    <!-- Kafel o'lchami -->
+                    <div class="input-group">
+                        <label>📏 Kafel o'lchami</label>
+                        <select id="tileSize" class="tile-select">
+                            <option value="30x30">30×30 sm</option>
+                            <option value="30x60" selected>30×60 sm</option>
+                            <option value="60x60">60×60 sm</option>
+                            <option value="60x120">60×120 sm</option>
+                        </select>
+                    </div>
+
+                    <!-- ===== TANLASH: DEVOR YOKI YER ===== -->
+                    <div class="input-group">
+                        <label>📐 Hisoblash turi</label>
+                        <div class="btn-group calc-type">
+                            <button class="btn-option active" data-type="devor" onclick="setCalcType('devor')">🧱 Devor</button>
+                            <button class="btn-option" data-type="yer" onclick="setCalcType('yer')">🟫 Yer (pol)</button>
+                        </div>
+                    </div>
+
+                    <!-- ===== QO'SHISH FUNKSIYASI ===== -->
+                    <div class="input-group">
+                        <label>📐 Qo'shiladigan maydonlar</label>
+                        <div id="areaContainer">
+                            <div class="input-with-btn area-row">
+                                <div class="input-group-sm">
+                                    <label>Uzunlik (m)</label>
+                                    <input type="number" class="area-length-input" value="2" step="0.1" min="0.1" />
+                                </div>
+                                <div class="input-group-sm">
+                                    <label id="heightLabel">Balandlik (m)</label>
+                                    <input type="number" class="area-height-input" value="2.5" step="0.1" min="0.1" />
+                                </div>
+                                <button class="btn-remove-row" onclick="removeAreaRow(this)">✖</button>
+                            </div>
+                        </div>
+                        <button class="btn-add-row" onclick="addAreaRow()">➕ Maydon qo'shish</button>
+                    </div>
+
+                    <!-- Eshik/deraza maydoni -->
+                    <div class="input-group">
+                        <label>🚪 Eshik/deraza maydoni (m²)</label>
+                        <input type="number" id="subtractArea" value="0" step="0.1" min="0" />
+                        <small>Agar bo'lmasa 0 qoldiring</small>
+                    </div>
+
+                    <!-- Zaxira foizi -->
+                    <div class="input-group">
+                        <label>📦 Qo'shimcha foiz (%)</label>
+                        <input type="number" id="wastePercent" value="5" step="1" min="0" max="30" />
+                        <small>Kamida 5% qo'shimcha kafel</small>
+                    </div>
+
+                    <!-- Kley narxi -->
+                    <div class="input-group">
+                        <label>💰 1 xalta kley narxi (so'm)</label>
+                        <input type="number" id="gluePrice" value="25000" step="1000" min="0" />
+                        <small>1 xalta = 25 kg</small>
+                    </div>
+
+                    <button class="btn-calculate" onclick="calculateTiles()">🧮 Hisoblash</button>
+
+                    <!-- Natijalar -->
+                    <div class="result-preview" id="tileResult">
+                        <div class="result-item">
+                            <span>📐 Hisoblash turi:</span>
+                            <strong id="calcTypeDisplay">Devor</strong>
+                        </div>
+                        <div class="result-item">
+                            <span>📐 Joy maydoni:</span>
+                            <strong id="tileArea">0 m²</strong>
+                        </div>
+                        <div class="result-item">
+                            <span>📏 1 ta kafel maydoni:</span>
+                            <strong id="tileSingleArea">0 m²</strong>
+                        </div>
+                        <div class="result-item" style="font-weight:700;color:#2563eb;">
+                            <span>🔢 Kerakli kafel:</span>
+                            <strong id="tileCount">0 ta</strong>
+                        </div>
+                        <div class="result-item" style="font-weight:600;color:#eab308;">
+                            <span>📦 Qo'shimcha kafel:</span>
+                            <strong id="tileExtra">0 ta</strong>
+                        </div>
+                        <div class="result-item total">
+                            <span>💎 Jami kafel:</span>
+                            <strong id="tileTotal">0 ta</strong>
+                        </div>
+                        <div class="result-item glue-item">
+                            <span>🧴 Kley miqdori:</span>
+                            <strong id="glueAmount">0 kg</strong>
+                        </div>
+                        <div class="result-item glue-item">
+                            <span>📦 Kley xaltalari:</span>
+                            <strong id="glueBags">0 xalta</strong>
+                        </div>
+                        <div class="result-item glue-item total">
+                            <span>💰 Kley narxi:</span>
+                            <strong id="glueTotalPrice">0 so'm</strong>
+                        </div>
+                    </div>
+
+                    <div id="tileDetails" class="square-details"></div>
+
+                    <!-- PNG HISOBOT YUKLASH -->
+                    <button class="btn btn-download-calc" onclick="downloadCalcPNG()" style="margin-top:12px; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #fff;">
+                        ⬇️ PNG Hisobotni yuklab olish
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <p class="footer-note">* PNG fayl qurilmangizga saqlanadi. Telegramga yuborish uchun botga ulangan bo'lishi kerak.</p>
+
+    </div>
+
+    <!-- ===== BARCHA JS FAYLLAR ===== -->
+    <script src="hisoblash.js"></script>
+    <script src="kalkulyator.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
