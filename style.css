@@ -170,6 +170,16 @@ body {
     padding-right: 36px;
 }
 
+.area-type-select,
+.gradus-type-select,
+.calc-gradus-type-select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+}
+
 /* ===== 3D XONA ===== */
 .room-container {
     background: var(--tg-theme-bg-color, #f1f5f9);
@@ -379,7 +389,14 @@ body {
 }
 
 /* ===== GRADUS INPUT ===== */
-#gradusContainer {
+#gradusContainer,
+#calcGradusContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#areaContainer {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -410,6 +427,35 @@ body {
 .input-with-btn input[type="number"]:focus {
     border-color: var(--tg-theme-button-color, #3b82f6);
     outline: none;
+}
+
+.input-with-btn select {
+    padding: 8px 10px;
+    border: 2px solid var(--tg-theme-separator-color, #e2e8f0);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    background: var(--tg-theme-secondary-bg-color, #ffffff);
+    color: var(--tg-theme-text-color, #1e293b);
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+}
+
+.input-with-btn select:focus {
+    border-color: var(--tg-theme-button-color, #3b82f6);
+    outline: none;
+}
+
+.area-row .input-group-sm,
+.gradus-row .input-group-sm {
+    min-width: 60px;
 }
 
 /* ===== NATIJALAR ===== */
@@ -475,103 +521,6 @@ body {
 
 .glue-item.total strong {
     color: var(--tg-theme-button-text-color, #ffffff) !important;
-}
-
-/* ===== TANLASH TUGMALARI ===== */
-.btn-group.calc-type,
-.btn-group.gradus-type,
-.btn-group.calc-gradus-type {
-    display: flex;
-    gap: 8px;
-    background: var(--tg-theme-bg-color, #f1f5f9);
-    padding: 4px;
-    border-radius: 12px;
-}
-
-.btn-group.calc-type .btn-option,
-.btn-group.gradus-type .btn-option,
-.btn-group.calc-gradus-type .btn-option {
-    flex: 1;
-    padding: 10px 16px;
-    border: none;
-    border-radius: 10px;
-    background: transparent;
-    font-weight: 600;
-    font-size: 14px;
-    color: var(--tg-theme-hint-color, #64748b);
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.btn-group.calc-type .btn-option:hover,
-.btn-group.gradus-type .btn-option:hover,
-.btn-group.calc-gradus-type .btn-option:hover {
-    color: var(--tg-theme-text-color, #1e293b);
-    background: rgba(255, 255, 255, 0.4);
-}
-
-.btn-group.calc-type .btn-option.active,
-.btn-group.gradus-type .btn-option.active,
-.btn-group.calc-gradus-type .btn-option.active {
-    background: var(--tg-theme-secondary-bg-color, #ffffff);
-    color: var(--tg-theme-text-color, #0f172a);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-}
-
-/* ===== AREA ROW ===== */
-#areaContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.area-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--tg-theme-bg-color, #f8fafc);
-    padding: 8px 10px;
-    border-radius: 10px;
-    border: 2px solid var(--tg-theme-separator-color, #e2e8f0);
-    flex-wrap: wrap;
-}
-
-.area-row .input-group-sm {
-    flex: 1;
-    min-width: 60px;
-}
-
-.area-row .input-group-sm label {
-    font-size: 9px;
-}
-
-.area-row .input-group-sm input {
-    padding: 5px 3px;
-    border: 2px solid var(--tg-theme-separator-color, #e2e8f0);
-    border-radius: 8px;
-    font-size: 12px;
-    text-align: center;
-    background: var(--tg-theme-secondary-bg-color, #ffffff);
-    width: 100%;
-    color: var(--tg-theme-text-color, #0f172a);
-}
-
-.area-row .btn-remove-row {
-    background: #ef4444;
-    color: #ffffff;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.3s;
-    flex-shrink: 0;
-    min-width: 32px;
-}
-
-.area-row .btn-remove-row:hover {
-    background: #dc2626;
 }
 
 /* ===== TAFSILOTLAR ===== */
@@ -1068,11 +1017,11 @@ body {
     .total-item { font-size: 13px; padding: 8px 12px; }
     .total-item strong { font-size: 14px; }
     .tab-btn { font-size: 13px; padding: 10px 12px; }
-    .btn-group.calc-type, .btn-group.gradus-type, .btn-group.calc-gradus-type { flex-direction: column; }
-    .btn-group.calc-type .btn-option, .btn-group.gradus-type .btn-option, .btn-group.calc-gradus-type .btn-option { padding: 8px 12px; font-size: 13px; }
-    .area-row { flex-direction: column; align-items: stretch; }
-    .area-row .input-group-sm { min-width: 100%; }
-    .area-row .btn-remove-row { width: 100%; }
+    .input-with-btn { flex-wrap: wrap; }
+    .input-with-btn .input-group-sm { min-width: 100% !important; }
+    .input-with-btn .btn-remove-row { width: 100%; }
+    .area-row .input-group-sm,
+    .gradus-row .input-group-sm { min-width: 100% !important; }
     .square-details { max-height: 120px; }
     .tile-single { width: 55px; height: 55px; font-size: 14px; }
     .tile-single .cut-line-single { width: 78px; }
