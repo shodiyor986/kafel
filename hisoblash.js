@@ -1,6 +1,7 @@
 /**
  * ============================================
  * HISOBLASH BO'LIMI - Kvadrat va 45° Gradus / Avalni
+ * 45° = 2x, Avalni = 1x
  * ============================================
  */
 
@@ -30,128 +31,7 @@ try {
     console.log('⚠️ Telegram Web App mavjud emas');
 }
 
-// ====== GRADUS TURI ======
-let gradusType = 'gradus'; // 'gradus' yoki 'avalni'
-
-// ====== GRADUS TURINI TANLASH ======
-function setGradusType(type) {
-    gradusType = type;
-    
-    // Tugmalarni yangilash
-    document.querySelectorAll('.gradus-type .btn-option').forEach(b => b.classList.remove('active'));
-    document.querySelector(`.gradus-type .btn-option[data-type="${type}"]`)?.classList.add('active');
-    
-    // Ma'lumot matnini yangilash
-    const info = document.getElementById('gradusInfo');
-    const title = document.getElementById('visualTitle');
-    const tilesLabel = document.getElementById('tilesLabel');
-    const totalLabel = document.getElementById('totalGradusLabel');
-    const receiptTitle = document.getElementById('receiptGradusTitle');
-    
-    if (type === 'gradus') {
-        info.textContent = '⚠️ 1 metr = 2 ta kafel 45° kesiladi';
-        title.textContent = '🔍 45° kesish va yopishtirish';
-        tilesLabel.textContent = '🔪 Kesiladigan kafel:';
-        totalLabel.textContent = '🔶 45° gradus:';
-        receiptTitle.textContent = '🔶 2. 45° gradus hisoblash:';
-        updateVisualGradus();
-    } else {
-        info.textContent = 'ℹ️ 1 metr = 1 ta kafel yon tomoni silliqlanadi';
-        title.textContent = '🔍 Avalni (yon tomonini silliqlash)';
-        tilesLabel.textContent = '🔪 Silliqlanadigan kafel:';
-        totalLabel.textContent = '🔷 Avalni (yon):';
-        receiptTitle.textContent = '🔷 2. Avalni (yon) hisoblash:';
-        updateVisualAvalni();
-    }
-    
-    calculateAll();
-}
-
-// ====== VIZUAL: 45 GRADUS ======
-function updateVisualGradus() {
-    const box = document.getElementById('tileBox');
-    const explanation = document.getElementById('tileExplanation');
-    if (box) {
-        box.innerHTML = `
-            <div class="tile tile-1">
-                <span>1</span>
-                <div class="cut-line"></div>
-            </div>
-            <div class="tile tile-2">
-                <span>2</span>
-                <div class="cut-line"></div>
-            </div>
-        `;
-    }
-    if (explanation) {
-        explanation.innerHTML = `
-            <p><span class="dot red"></span> 1-kafel 45° kesiladi</p>
-            <p><span class="dot blue"></span> 2-kafel 45° kesiladi</p>
-            <p><span class="dot green"></span> 1 metr = 2 ta kafel</p>
-        `;
-    }
-    // Kvitansiya vizualini ham yangilash
-    const receiptBox = document.querySelector('.receipt-tile-box');
-    const receiptExplanation = document.getElementById('receiptExplanation');
-    if (receiptBox) {
-        receiptBox.innerHTML = `
-            <div class="receipt-tile receipt-tile-1">
-                <span>1</span>
-                <div class="receipt-cut-line"></div>
-            </div>
-            <div class="receipt-tile receipt-tile-2">
-                <span>2</span>
-                <div class="receipt-cut-line"></div>
-            </div>
-        `;
-    }
-    if (receiptExplanation) {
-        receiptExplanation.innerHTML = `
-            <p><span class="dot red"></span> 1-kafel 45° kesiladi</p>
-            <p><span class="dot blue"></span> 2-kafel 45° kesiladi</p>
-            <p><span class="dot green"></span> 1 metr = 2 ta kafel</p>
-        `;
-    }
-}
-
-// ====== VIZUAL: AVALNI ======
-function updateVisualAvalni() {
-    const box = document.getElementById('tileBox');
-    const explanation = document.getElementById('tileExplanation');
-    if (box) {
-        box.innerHTML = `
-            <div class="tile-single">
-                <span>1</span>
-                <div class="cut-line-single"></div>
-            </div>
-        `;
-    }
-    if (explanation) {
-        explanation.innerHTML = `
-            <p><span class="dot blue"></span> 1-kafel yon tomoni silliqlanadi</p>
-            <p><span class="dot green"></span> 1 metr = 1 ta kafel</p>
-        `;
-    }
-    // Kvitansiya vizualini ham yangilash
-    const receiptBox = document.querySelector('.receipt-tile-box');
-    const receiptExplanation = document.getElementById('receiptExplanation');
-    if (receiptBox) {
-        receiptBox.innerHTML = `
-            <div class="receipt-tile receipt-tile-1" style="background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%); border-color: #3b82f6;">
-                <span>1</span>
-                <div class="receipt-cut-line" style="background: #3b82f6;"></div>
-            </div>
-        `;
-    }
-    if (receiptExplanation) {
-        receiptExplanation.innerHTML = `
-            <p><span class="dot blue"></span> 1-kafel yon tomoni silliqlanadi</p>
-            <p><span class="dot green"></span> 1 metr = 1 ta kafel</p>
-        `;
-    }
-}
-
-// ====== 1. STEKIR (KVADRAT) HISOBLASH ======
+// ====== 1. KVADRAT HISOBLASH ======
 function calculateSquare() {
     const price = parseFloat(document.getElementById('squarePrice').value) || 0;
 
@@ -284,63 +164,247 @@ function removeExtraWall(btn) {
     calculateAll();
 }
 
-// ====== 3. 45 GRADUS / AVALNI ======
+// ====== 3. 45 GRADUS / AVALNI (QO'SHISH VA O'CHIRISH) ======
 function addGradusRow() {
     const container = document.getElementById('gradusContainer');
     const div = document.createElement('div');
-    div.className = 'input-with-btn';
+    div.className = 'input-with-btn gradus-row';
     div.innerHTML = `
-        <input type="number" class="gradus-meter-input" value="1" step="0.1" min="0" />
+        <div class="input-group-sm" style="flex:1.5;">
+            <select class="gradus-type-select">
+                <option value="gradus">🔶 45° Gradus</option>
+                <option value="avalni">🔷 Avalni (yon)</option>
+            </select>
+        </div>
+        <div class="input-group-sm" style="flex:1;">
+            <label>Metr (m)</label>
+            <input type="number" class="gradus-meter-input" value="1" step="0.1" min="0" />
+        </div>
         <button class="btn-remove-row" onclick="removeGradusRow(this)">✖</button>
     `;
     container.appendChild(div);
 
-    div.querySelectorAll('input').forEach(i => {
+    div.querySelectorAll('input, select').forEach(i => {
         i.addEventListener('input', calculateAll);
-        i.addEventListener('change', calculateAll);
+        i.addEventListener('change', function() {
+            updateGradusVisual();
+            calculateAll();
+        });
     });
 
+    updateGradusVisual();
     calculateAll();
 }
 
 function removeGradusRow(btn) {
     const container = document.getElementById('gradusContainer');
     if (container.children.length > 1) {
-        btn.closest('.input-with-btn').remove();
+        btn.closest('.gradus-row').remove();
+        updateGradusVisual();
         calculateAll();
     } else {
         alert('Kamida 1 ta qator qolishi kerak!');
     }
 }
 
+// ====== 4. GRADUS VIZUALNI YANGILASH ======
+function updateGradusVisual() {
+    const rows = document.querySelectorAll('#gradusContainer .gradus-row');
+    let hasGradus = false;
+    let hasAvalni = false;
+    
+    rows.forEach(row => {
+        const select = row.querySelector('.gradus-type-select');
+        if (select) {
+            const type = select.value;
+            if (type === 'gradus') hasGradus = true;
+            else if (type === 'avalni') hasAvalni = true;
+        }
+    });
+    
+    const visualContainer = document.getElementById('visualContainer');
+    const title = document.getElementById('visualTitle');
+    const tileBox = document.getElementById('tileBox');
+    const explanation = document.getElementById('tileExplanation');
+    const tilesLabel = document.getElementById('tilesLabel');
+    const gradusInfo = document.getElementById('gradusInfo');
+    const totalLabel = document.getElementById('totalGradusLabel');
+    const receiptTitle = document.getElementById('receiptGradusTitle');
+    
+    if (hasGradus) {
+        title.textContent = '🔍 45° kesish va yopishtirish';
+        tilesLabel.textContent = '🔪 Kesiladigan kafel:';
+        totalLabel.textContent = '🔶 45° gradus:';
+        receiptTitle.textContent = '🔶 2. 45° gradus hisoblash:';
+        gradusInfo.textContent = '⚠️ 1 metr = 2 ta kafel 45° kesiladi';
+        
+        if (tileBox) {
+            tileBox.innerHTML = `
+                <div class="tile tile-1">
+                    <span>1</span>
+                    <div class="cut-line"></div>
+                </div>
+                <div class="tile tile-2">
+                    <span>2</span>
+                    <div class="cut-line"></div>
+                </div>
+            `;
+        }
+        if (explanation) {
+            explanation.innerHTML = `
+                <p><span class="dot red"></span> 1-kafel 45° kesiladi</p>
+                <p><span class="dot blue"></span> 2-kafel 45° kesiladi</p>
+                <p><span class="dot green"></span> 1 metr = 2 ta kafel</p>
+            `;
+        }
+        const receiptBox = document.querySelector('.receipt-tile-box');
+        const receiptExplanation = document.getElementById('receiptExplanation');
+        if (receiptBox) {
+            receiptBox.innerHTML = `
+                <div class="receipt-tile receipt-tile-1">
+                    <span>1</span>
+                    <div class="receipt-cut-line"></div>
+                </div>
+                <div class="receipt-tile receipt-tile-2">
+                    <span>2</span>
+                    <div class="receipt-cut-line"></div>
+                </div>
+            `;
+        }
+        if (receiptExplanation) {
+            receiptExplanation.innerHTML = `
+                <p><span class="dot red"></span> 1-kafel 45° kesiladi</p>
+                <p><span class="dot blue"></span> 2-kafel 45° kesiladi</p>
+                <p><span class="dot green"></span> 1 metr = 2 ta kafel</p>
+            `;
+        }
+    } else if (hasAvalni) {
+        title.textContent = '🔍 Avalni (yon tomonini silliqlash)';
+        tilesLabel.textContent = '🔪 Silliqlanadigan kafel:';
+        totalLabel.textContent = '🔷 Avalni (yon):';
+        receiptTitle.textContent = '🔷 2. Avalni (yon) hisoblash:';
+        gradusInfo.textContent = 'ℹ️ 1 metr = 1 ta kafel yon tomoni silliqlanadi';
+        
+        if (tileBox) {
+            tileBox.innerHTML = `
+                <div class="tile-single">
+                    <span>1</span>
+                    <div class="cut-line-single"></div>
+                </div>
+            `;
+        }
+        if (explanation) {
+            explanation.innerHTML = `
+                <p><span class="dot blue"></span> 1-kafel yon tomoni silliqlanadi</p>
+                <p><span class="dot green"></span> 1 metr = 1 ta kafel</p>
+            `;
+        }
+        const receiptBox = document.querySelector('.receipt-tile-box');
+        const receiptExplanation = document.getElementById('receiptExplanation');
+        if (receiptBox) {
+            receiptBox.innerHTML = `
+                <div class="receipt-tile receipt-tile-1" style="background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%); border-color: #3b82f6;">
+                    <span>1</span>
+                    <div class="receipt-cut-line" style="background: #3b82f6;"></div>
+                </div>
+            `;
+        }
+        if (receiptExplanation) {
+            receiptExplanation.innerHTML = `
+                <p><span class="dot blue"></span> 1-kafel yon tomoni silliqlanadi</p>
+                <p><span class="dot green"></span> 1 metr = 1 ta kafel</p>
+            `;
+        }
+    } else {
+        title.textContent = '🔍 45° kesish va yopishtirish';
+        tilesLabel.textContent = '🔪 Kesiladigan kafel:';
+        totalLabel.textContent = '🔶 45° gradus:';
+        receiptTitle.textContent = '🔶 2. 45° gradus hisoblash:';
+        gradusInfo.textContent = '⚠️ 1 metr = 2 ta kafel 45° kesiladi';
+        
+        if (tileBox) {
+            tileBox.innerHTML = `
+                <div class="tile tile-1">
+                    <span>1</span>
+                    <div class="cut-line"></div>
+                </div>
+                <div class="tile tile-2">
+                    <span>2</span>
+                    <div class="cut-line"></div>
+                </div>
+            `;
+        }
+        if (explanation) {
+            explanation.innerHTML = `
+                <p><span class="dot red"></span> 1-kafel 45° kesiladi</p>
+                <p><span class="dot blue"></span> 2-kafel 45° kesiladi</p>
+                <p><span class="dot green"></span> 1 metr = 2 ta kafel</p>
+            `;
+        }
+        const receiptBox = document.querySelector('.receipt-tile-box');
+        const receiptExplanation = document.getElementById('receiptExplanation');
+        if (receiptBox) {
+            receiptBox.innerHTML = `
+                <div class="receipt-tile receipt-tile-1">
+                    <span>1</span>
+                    <div class="receipt-cut-line"></div>
+                </div>
+                <div class="receipt-tile receipt-tile-2">
+                    <span>2</span>
+                    <div class="receipt-cut-line"></div>
+                </div>
+            `;
+        }
+        if (receiptExplanation) {
+            receiptExplanation.innerHTML = `
+                <p><span class="dot red"></span> 1-kafel 45° kesiladi</p>
+                <p><span class="dot blue"></span> 2-kafel 45° kesiladi</p>
+                <p><span class="dot green"></span> 1 metr = 2 ta kafel</p>
+            `;
+        }
+    }
+}
+
+// ====== 5. 45 GRADUS / AVALNI HISOBLASH ======
 function calculateGradus() {
     const price = parseFloat(document.getElementById('gradusPrice').value) || 0;
-    const inputs = document.querySelectorAll('.gradus-meter-input');
+    const rows = document.querySelectorAll('#gradusContainer .gradus-row');
 
     let totalMeter = 0;
+    let totalTiles = 0;
+    let totalPrice = 0;
     let details = [];
-    let multiplier = gradusType === 'gradus' ? 2 : 1;
-    let typeName = gradusType === 'gradus' ? '45°' : 'Avalni';
-    let typeIcon = gradusType === 'gradus' ? '🔶' : '🔷';
 
-    inputs.forEach((input, index) => {
-        const meter = parseFloat(input.value) || 0;
-        totalMeter += meter;
+    rows.forEach((row, index) => {
+        const select = row.querySelector('.gradus-type-select');
+        const type = select ? select.value : 'gradus';
+        const meter = parseFloat(row.querySelector('.gradus-meter-input').value) || 0;
+        
+        // ===== MUHIM: 45° = 2x, Avalni = 1x =====
+        const multiplier = (type === 'gradus') ? 2 : 1;
+        const typeName = (type === 'gradus') ? '45° Gradus' : 'Avalni (yon)';
+        const typeIcon = (type === 'gradus') ? '🔶' : '🔷';
+        
         if (meter > 0) {
             const tiles = meter * multiplier;
-            const totalPrice = meter * price * multiplier;
+            const priceTotal = meter * price * multiplier;
+            
+            totalMeter += meter;
+            totalTiles += tiles;
+            totalPrice += priceTotal;
+            
             details.push({
-                label: `Qator ${index + 1}`,
+                index: index + 1,
+                type: typeName,
+                typeIcon: typeIcon,
                 meter: meter,
+                multiplier: multiplier,
                 tiles: tiles,
-                price: totalPrice,
+                price: priceTotal,
                 text: `${meter.toFixed(1)} m × ${multiplier} = ${tiles.toFixed(1)} ta kafel`
             });
         }
     });
-
-    const totalTiles = totalMeter * multiplier;
-    const totalPrice = totalMeter * price * multiplier;
 
     document.getElementById('gradusTiles').textContent = totalTiles.toFixed(1) + ' ta';
     document.getElementById('gradusPriceResult').textContent = totalPrice.toLocaleString('uz-UZ') + " so'm";
@@ -349,23 +413,24 @@ function calculateGradus() {
         meter: totalMeter,
         tiles: totalTiles,
         total: totalPrice,
-        details: details,
-        type: gradusType,
-        multiplier: multiplier,
-        typeName: typeName,
-        typeIcon: typeIcon
+        details: details
     };
 }
 
-// ====== 4. LISTENERLAR ======
+// ====== 6. LISTENERLAR ======
 function addListeners() {
-    document.querySelectorAll('.wall-input, .extra-length, .extra-height, .gradus-meter-input, .extra-wall-selector').forEach(i => {
+    document.querySelectorAll('.wall-input, .extra-length, .extra-height, .gradus-meter-input, .extra-wall-selector, .gradus-type-select').forEach(i => {
         i.addEventListener('input', calculateAll);
-        i.addEventListener('change', calculateAll);
+        i.addEventListener('change', function() {
+            if (this.classList.contains('gradus-type-select') || this.classList.contains('gradus-meter-input')) {
+                updateGradusVisual();
+            }
+            calculateAll();
+        });
     });
 }
 
-// ====== 5. ASOSIY HISOB ======
+// ====== 7. ASOSIY HISOB ======
 function calculateAll() {
     const square = calculateSquare();
     const gradus = calculateGradus();
@@ -378,7 +443,7 @@ function calculateAll() {
     updateReceipt(square, gradus, grand);
 }
 
-// ====== 6. KVITANSIYA ======
+// ====== 8. KVITANSIYA ======
 function updateReceipt(square, gradus, grand) {
     const now = new Date();
     const dateStr = now.toLocaleDateString('uz-UZ', {
@@ -413,10 +478,6 @@ function updateReceipt(square, gradus, grand) {
     document.getElementById('receiptSquare').innerHTML = squareHTML;
 
     // 45 Gradus / Avalni
-    const typeName = gradus.type === 'gradus' ? '45° gradus' : 'Avalni (yon)';
-    const typeIcon = gradus.type === 'gradus' ? '🔶' : '🔷';
-    document.getElementById('receiptGradusTitle').textContent = `${typeIcon} 2. ${typeName} hisoblash:`;
-
     let gradusDetailsHTML = '';
     if (gradus.details.length === 0) {
         gradusDetailsHTML += '<div class="receipt-item" style="color:#94a3b8;">Ma\'lumot kiritilmagan</div>';
@@ -424,7 +485,7 @@ function updateReceipt(square, gradus, grand) {
         gradus.details.forEach(item => {
             gradusDetailsHTML += `
                 <div class="receipt-item">
-                    ${item.label}: ${item.text} → ${item.price.toLocaleString('uz-UZ')} so'm
+                    ${item.typeIcon} ${item.type} ${item.index}: ${item.text} → ${item.price.toLocaleString('uz-UZ')} so'm
                 </div>
             `;
         });
@@ -438,7 +499,7 @@ function updateReceipt(square, gradus, grand) {
     document.getElementById('receipt').style.display = 'block';
 }
 
-// ====== 7. PNG YUKLAB OLISH ======
+// ====== 9. PNG YUKLAB OLISH ======
 function downloadPNG() {
     calculateAll();
 
@@ -487,7 +548,7 @@ function downloadPNG() {
     });
 }
 
-// ====== 8. TELEGRAMGA YUBORISH ======
+// ====== 10. TELEGRAMGA YUBORISH ======
 function sendToTelegram() {
     if (!isTelegram || !tg) {
         alert('⚠️ Telegram Web App ulanishi topilmadi!\n\nIltimos, bot orqali oching yoki "PNG yuklab olish" tugmasidan foydalaning.');
@@ -543,7 +604,7 @@ function sendToTelegram() {
     });
 }
 
-// ====== 9. BOSHLASH ======
+// ====== 11. BOSHLASH ======
 document.addEventListener('DOMContentLoaded', function() {
     addListeners();
 
@@ -552,13 +613,12 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('gradusPrice').addEventListener('input', calculateAll);
     document.getElementById('gradusPrice').addEventListener('change', calculateAll);
 
-    // Default - 45 gradus
-    setGradusType('gradus');
-
+    updateGradusVisual();
     calculateAll();
 
     console.log('✅ Hisoblash bo\'limi ishga tushdi!');
-    console.log('📐 45° Gradus va Avalni (yon) qo\'shildi!');
+    console.log('📐 45° Gradus: 1 metr = 2 ta kafel');
+    console.log('📐 Avalni: 1 metr = 1 ta kafel');
 });
 
 document.addEventListener('keydown', function(e) {
@@ -570,8 +630,7 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// ====== 10. GLOBAL FUNKSIYALAR ======
-window.setGradusType = setGradusType;
+// ====== 12. GLOBAL FUNKSIYALAR ======
 window.addExtraWall = addExtraWall;
 window.removeExtraWall = removeExtraWall;
 window.addGradusRow = addGradusRow;
@@ -579,3 +638,4 @@ window.removeGradusRow = removeGradusRow;
 window.calculateAll = calculateAll;
 window.downloadPNG = downloadPNG;
 window.sendToTelegram = sendToTelegram;
+window.updateGradusVisual = updateGradusVisual;
