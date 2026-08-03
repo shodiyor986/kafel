@@ -151,12 +151,12 @@
                         <small id="gradusInfo">⚠️ 1 metr = 2 ta kafel 45° kesiladi</small>
                     </div>
 
-                    <!-- ===== METRLAR KONTEYNERI (QO'SHISH BILAN) ===== -->
+                    <!-- ===== METRLAR KONTEYNERI ===== -->
                     <div class="input-group">
                         <label>📏 Metrlar</label>
                         <div id="gradusContainer">
                             <div class="input-with-btn gradus-row">
-                                <div class="input-group-sm" style="flex:2;">
+                                <div class="input-group-sm" style="flex:1.5;">
                                     <select class="gradus-type-select">
                                         <option value="gradus">🔶 45° Gradus</option>
                                         <option value="avalni">🔷 Avalni (yon)</option>
@@ -300,7 +300,7 @@
                         </select>
                     </div>
 
-                    <!-- ===== 1. DEVOR / YER HISOBLASH (BIRGA) ===== -->
+                    <!-- ===== 1. DEVOR / YER ===== -->
                     <div class="input-group">
                         <label>📐 Yuzaki o'lchamlari</label>
                         <div id="areaContainer">
@@ -316,7 +316,7 @@
                                     <input type="number" class="area-length-input" value="2" step="0.1" min="0.1" />
                                 </div>
                                 <div class="input-group-sm" style="flex:1;">
-                                    <label id="heightLabel">Balandlik (m)</label>
+                                    <label class="area-height-label">Balandlik (m)</label>
                                     <input type="number" class="area-height-input" value="2.5" step="0.1" min="0.1" />
                                 </div>
                                 <button class="btn-remove-row" onclick="removeAreaRow(this)">✖</button>
@@ -339,7 +339,7 @@
                         <small>Kamida 5% qo'shimcha kafel</small>
                     </div>
 
-                    <!-- ===== 2. 45 GRADUS / AVALNI (BIRGA) ===== -->
+                    <!-- ===== 2. 45 GRADUS / AVALNI ===== -->
                     <div class="input-group">
                         <label>📏 45° Gradus / Avalni metrlari</label>
                         <div id="calcGradusContainer">
