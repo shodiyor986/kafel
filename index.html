@@ -287,7 +287,7 @@
         </div>
 
         <!-- ============================================================ -->
-        <!-- ===== 2. KALKULYATOR BO'LIMI ===== -->
+        <!-- ===== 2. KALKULYATOR BO'LIMI (YANGI - 45° VA AVALNI BILAN) ===== -->
         <!-- ============================================================ -->
         <div id="tab-kalkulyator" class="tab-content">
             <section class="card card-calculator">
@@ -310,10 +310,19 @@
 
                     <!-- ===== TANLASH: DEVOR YOKI YER ===== -->
                     <div class="input-group">
-                        <label>📐 Hisoblash turi</label>
+                        <label>📐 Yuzaki turi</label>
                         <div class="btn-group calc-type">
                             <button class="btn-option active" data-type="devor" onclick="setCalcType('devor')">🧱 Devor</button>
                             <button class="btn-option" data-type="yer" onclick="setCalcType('yer')">🟫 Yer (pol)</button>
+                        </div>
+                    </div>
+
+                    <!-- ===== TANLASH: 45 GRADUS YOKI AVALNI ===== -->
+                    <div class="input-group">
+                        <label>📐 Hisoblash turi</label>
+                        <div class="btn-group calc-gradus-type">
+                            <button class="btn-option active" data-type="gradus" onclick="setCalcGradusType('gradus')">🔶 45° Gradus</button>
+                            <button class="btn-option" data-type="avalni" onclick="setCalcGradusType('avalni')">🔷 Avalni (yon)</button>
                         </div>
                     </div>
 
@@ -362,8 +371,12 @@
                     <!-- Natijalar -->
                     <div class="result-preview" id="tileResult">
                         <div class="result-item">
-                            <span>📐 Hisoblash turi:</span>
+                            <span>📐 Yuzaki turi:</span>
                             <strong id="calcTypeDisplay">Devor</strong>
+                        </div>
+                        <div class="result-item">
+                            <span>📐 Hisoblash turi:</span>
+                            <strong id="calcGradusTypeDisplay">45° Gradus</strong>
                         </div>
                         <div class="result-item">
                             <span>📐 Joy maydoni:</span>
