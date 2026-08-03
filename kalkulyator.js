@@ -1,7 +1,7 @@
 /**
  * ============================================
  * KALKULYATOR BO'LIMI - Kafel miqdorini hisoblash
- * Devor va Yer (pol) uchun, 45° Gradus va Avalni bilan
+ * Devor/Yer va 45° Gradus/Avalni bir funksiya ichida
  * ============================================
  */
 
@@ -25,54 +25,42 @@ const GLUE_CONSUMPTION = {
 const GLUE_BAG_WEIGHT = 25;
 const MIN_WASTE = 5;
 
-// ====== 4. HISOBLASH TURLARI ======
-let calcType = 'devor';
-let calcGradusType = 'gradus';
+// ====== 4. QO'SHISH FUNKSIYALARI ======
 
-// ====== 5. TANLASH FUNKSIYALARI ======
-function setCalcType(type) {
-    calcType = type;
-    document.querySelectorAll('.calc-type .btn-option').forEach(b => b.classList.remove('active'));
-    document.querySelector(`.calc-type .btn-option[data-type="${type}"]`)?.classList.add('active');
-    
-    const label = document.getElementById('heightLabel');
-    if (label) {
-        label.textContent = type === 'devor' ? 'Balandlik (m)' : 'Kenglik (m)';
-    }
-    
-    calculateTiles();
-}
-
-function setCalcGradusType(type) {
-    calcGradusType = type;
-    document.querySelectorAll('.calc-gradus-type .btn-option').forEach(b => b.classList.remove('active'));
-    document.querySelector(`.calc-gradus-type .btn-option[data-type="${type}"]`)?.classList.add('active');
-    
-    calculateTiles();
-}
-
-// ====== 6. QO'SHISH FUNKSIYASI ======
+// --- 4.1. AREA (DEVOY / YER) QO'SHISH ---
 function addAreaRow() {
     const container = document.getElementById('areaContainer');
     const div = document.createElement('div');
     div.className = 'input-with-btn area-row';
-    const hLabel = calcType === 'devor' ? 'Balandlik' : 'Kenglik';
     div.innerHTML = `
-        <div class="input-group-sm">
+        <div class="input-group-sm" style="flex:1.5;">
+            <select class="area-type-select">
+                <option value="devor">🧱 Devor</option>
+                <option value="yer">🟫 Yer (pol)</option>
+            </select>
+        </div>
+        <div class="input-group-sm" style="flex:1;">
             <label>Uzunlik (m)</label>
             <input type="number" class="area-length-input" value="1" step="0.1" min="0.1" />
         </div>
-        <div class="input-group-sm">
-            <label>${hLabel} (m)</label>
+        <div class="input-group-sm" style="flex:1;">
+            <label class="area-height-label">Balandlik (m)</label>
             <input type="number" class="area-height-input" value="2.5" step="0.1" min="0.1" />
         </div>
         <button class="btn-remove-row" onclick="removeAreaRow(this)">✖</button>
     `;
     container.appendChild(div);
     
-    div.querySelectorAll('input').forEach(i => {
+    // Labelni yangilash
+    updateAreaLabels(div);
+    
+    // Listenerlar
+    div.querySelectorAll('input, select').forEach(i => {
         i.addEventListener('input', calculateTiles);
-        i.addEventListener('change', calculateTiles);
+        i.addEventListener('change', function() {
+            updateAreaLabels(this.closest('.area-row'));
+            calculateTiles();
+        });
     });
     
     calculateTiles();
@@ -88,7 +76,91 @@ function removeAreaRow(btn) {
     }
 }
 
-// ====== 7. KAFEL HISOBLASH ======
+function updateAreaLabels(row) {
+    const select = row.querySelector('.area-type-select');
+    const label = row.querySelector('.area-height-label');
+    if (select && label) {
+        label.textContent = select.value === 'devor' ? 'Balandlik (m)' : 'Kenglik (m)';
+    }
+}
+
+// --- 4.2. GRADUS (45° / AVALNI) QO'SHISH ---
+function addGradusRow() {
+    const container = document.getElementById('gradusContainer');
+    const div = document.createElement('div');
+    div.className = 'input-with-btn gradus-row';
+    div.innerHTML = `
+        <div class="input-group-sm" style="flex:1.5;">
+            <select class="gradus-type-select">
+                <option value="gradus">🔶 45° Gradus</option>
+                <option value="avalni">🔷 Avalni (yon)</option>
+            </select>
+        </div>
+        <div class="input-group-sm" style="flex:1;">
+            <label>Metr (m)</label>
+            <input type="number" class="gradus-meter-input" value="1" step="0.1" min="0" />
+        </div>
+        <button class="btn-remove-row" onclick="removeGradusRow(this)">✖</button>
+    `;
+    container.appendChild(div);
+    
+    div.querySelectorAll('input, select').forEach(i => {
+        i.addEventListener('input', calculateAll);
+        i.addEventListener('change', calculateAll);
+    });
+    
+    calculateAll();
+}
+
+function removeGradusRow(btn) {
+    const container = document.getElementById('gradusContainer');
+    if (container.children.length > 1) {
+        btn.closest('.gradus-row').remove();
+        calculateAll();
+    } else {
+        alert('Kamida 1 ta qator qolishi kerak!');
+    }
+}
+
+// --- 4.3. CALC GRADUS (45° / AVALNI) QO'SHISH ---
+function addCalcGradusRow() {
+    const container = document.getElementById('calcGradusContainer');
+    const div = document.createElement('div');
+    div.className = 'input-with-btn gradus-row';
+    div.innerHTML = `
+        <div class="input-group-sm" style="flex:1.5;">
+            <select class="calc-gradus-type-select">
+                <option value="gradus">🔶 45° Gradus</option>
+                <option value="avalni">🔷 Avalni (yon)</option>
+            </select>
+        </div>
+        <div class="input-group-sm" style="flex:1;">
+            <label>Metr (m)</label>
+            <input type="number" class="calc-gradus-meter-input" value="1" step="0.1" min="0" />
+        </div>
+        <button class="btn-remove-row" onclick="removeCalcGradusRow(this)">✖</button>
+    `;
+    container.appendChild(div);
+    
+    div.querySelectorAll('input, select').forEach(i => {
+        i.addEventListener('input', calculateTiles);
+        i.addEventListener('change', calculateTiles);
+    });
+    
+    calculateTiles();
+}
+
+function removeCalcGradusRow(btn) {
+    const container = document.getElementById('calcGradusContainer');
+    if (container.children.length > 1) {
+        btn.closest('.gradus-row').remove();
+        calculateTiles();
+    } else {
+        alert('Kamida 1 ta qator qolishi kerak!');
+    }
+}
+
+// ====== 5. KAFEL HISOBLASH ======
 function calculateTiles() {
     // Ma'lumotlarni olish
     const size = document.getElementById('tileSize').value;
@@ -102,70 +174,77 @@ function calculateTiles() {
         return;
     }
     
-    // ===== BARCHA MAYDONLARNI HISOBLASH =====
-    const lInputs = document.querySelectorAll('.area-length-input');
-    const hInputs = document.querySelectorAll('.area-height-input');
-    
+    // ===== 1. DEVOR / YER MAYDONLARI =====
+    const areaRows = document.querySelectorAll('#areaContainer .area-row');
     let totalArea = 0;
-    let areas = [];
+    let areaDetails = [];
     
-    lInputs.forEach((i, idx) => {
-        const l = parseFloat(i.value) || 0;
-        const h = parseFloat(hInputs[idx]?.value) || 0;
-        const a = l * h;
-        if (a > 0) {
-            totalArea += a;
-            areas.push({
+    areaRows.forEach((row, idx) => {
+        const select = row.querySelector('.area-type-select');
+        const type = select ? select.value : 'devor';
+        const typeName = type === 'devor' ? '🧱 Devor' : '🟫 Yer';
+        
+        const length = parseFloat(row.querySelector('.area-length-input').value) || 0;
+        const height = parseFloat(row.querySelector('.area-height-input').value) || 0;
+        const area = length * height;
+        
+        if (area > 0) {
+            totalArea += area;
+            areaDetails.push({
                 index: idx + 1,
-                length: l,
-                height: h,
-                area: a
+                type: typeName,
+                length: length,
+                height: height,
+                area: area
             });
         }
     });
     
     const netArea = Math.max(0, totalArea - sub);
     const tileArea = tile.width * tile.height;
+    const needed = Math.ceil(netArea / tileArea);
     
-    // ===== KERAKLI KAFEL =====
-    let needed = Math.ceil(netArea / tileArea);
+    // ===== 2. 45 GRADUS / AVALNI =====
+    const gradusRows = document.querySelectorAll('#calcGradusContainer .gradus-row');
+    let totalGradusTiles = 0;
+    let gradusDetails = [];
     
-    // ===== 45 GRADUS YOKI AVALNI =====
-    let gradusTypeName = '';
-    let gradusTypeIcon = '';
-    let gradusExtraTiles = 0;
+    gradusRows.forEach((row, idx) => {
+        const select = row.querySelector('.calc-gradus-type-select');
+        const type = select ? select.value : 'gradus';
+        const typeName = type === 'gradus' ? '🔶 45° Gradus' : '🔷 Avalni (yon)';
+        const multiplier = type === 'gradus' ? 2 : 1;
+        
+        const meter = parseFloat(row.querySelector('.calc-gradus-meter-input').value) || 0;
+        const tiles = meter * multiplier;
+        
+        if (meter > 0) {
+            totalGradusTiles += tiles;
+            gradusDetails.push({
+                index: idx + 1,
+                type: typeName,
+                meter: meter,
+                tiles: tiles,
+                multiplier: multiplier
+            });
+        }
+    });
     
-    if (calcGradusType === 'gradus') {
-        // 45 gradus: qo'shimcha 1x (jami 2x)
-        gradusExtraTiles = needed;
-        gradusTypeName = '45° Gradus';
-        gradusTypeIcon = '🔶';
-    } else {
-        // Avalni: qo'shimcha 0 (jami 1x)
-        gradusExtraTiles = 0;
-        gradusTypeName = 'Avalni (yon)';
-        gradusTypeIcon = '🔷';
-    }
+    // ===== JAMI KAFEL =====
+    let totalTilesBeforeWaste = needed + totalGradusTiles;
     
-    // ===== JAMI KAFEL (45° qo'shimchasi bilan) =====
-    let totalTilesBeforeWaste = needed + gradusExtraTiles;
-    
-    // ===== QO'SHIMCHA FOIZ (ZAXIRA) =====
+    // ===== ZAXIRA =====
     waste = Math.max(waste, MIN_WASTE);
     const extraPercent = Math.ceil(totalTilesBeforeWaste * (waste / 100));
     const totalTiles = totalTilesBeforeWaste + extraPercent;
     
-    // ===== KLEY HISOBLASH =====
+    // ===== KLEY =====
     const gluePerM2 = GLUE_CONSUMPTION[size] || 4.0;
     const totalGlue = netArea * gluePerM2;
     const glueBags = Math.ceil(totalGlue / GLUE_BAG_WEIGHT);
     const glueTotal = glueBags * gluePrice;
     
-    // ===== NATIJALARNI CHIQARISH =====
-    const typeName = calcType === 'devor' ? '🧱 Devor' : '🟫 Yer (pol)';
-    
-    document.getElementById('calcTypeDisplay').textContent = typeName;
-    document.getElementById('calcGradusTypeDisplay').textContent = gradusTypeIcon + ' ' + gradusTypeName;
+    // ===== NATIJALAR =====
     document.getElementById('tileArea').textContent = netArea.toFixed(2) + ' m²';
     document.getElementById('tileSingleArea').textContent = tileArea.toFixed(4) + ' m²';
     document.getElementById('tileCount').textContent = needed.toLocaleString() + ' ta';
@@ -176,30 +255,21 @@ function calculateTiles() {
     document.getElementById('glueTotalPrice').textContent = glueTotal.toLocaleString('uz-UZ') + " so'm";
     
     // ===== TAFSILOTLAR =====
-    const hLabel = calcType === 'devor' ? 'Balandlik' : 'Kenglik';
     let h = `
-        <div class="detail-item">
-            <span class="detail-label">📏 Yuzaki turi:</span>
-            <span class="detail-value">${typeName}</span>
-        </div>
-        <div class="detail-item">
-            <span class="detail-label">📏 Hisoblash turi:</span>
-            <span class="detail-value">${gradusTypeIcon} ${gradusTypeName}</span>
-        </div>
         <div class="detail-item">
             <span class="detail-label">📏 Kafel o'lchami:</span>
             <span class="detail-value">${tile.name}</span>
         </div>
-        <div class="detail-item">
-            <span class="detail-label">📐 Joy maydoni:</span>
+        <div class="detail-item" style="border-top:2px solid #3b82f6;padding-top:6px;margin-top:4px;">
+            <span class="detail-label">📐 1. Yuzaki maydonlari:</span>
             <span class="detail-value">${totalArea.toFixed(2)} m²</span>
         </div>
     `;
     
-    areas.forEach(a => {
+    areaDetails.forEach(a => {
         h += `
             <div class="detail-item">
-                <span class="detail-label">  📐 Maydon ${a.index}:</span>
+                <span class="detail-label">  ${a.type} ${a.index}:</span>
                 <span class="detail-value">${a.length} × ${a.height} = ${a.area.toFixed(2)} m²</span>
             </div>
         `;
@@ -214,4 +284,139 @@ function calculateTiles() {
             <span class="detail-label">📐 Sof maydon:</span>
             <span class="detail-value">${netArea.toFixed(2)} m²</span>
         </div>
-        <div class="detail-item" style="border-top:2px solid #3b82f6;padding-top:6
+        <div class="detail-item" style="border-top:2px solid #3b82f6;padding-top:6px;margin-top:4px;">
+            <span class="detail-label">📏 1 ta kafel maydoni:</span>
+            <span class="detail-value">${tileArea.toFixed(4)} m²</span>
+        </div>
+        <div class="detail-item" style="font-weight:700;color:#2563eb;">
+            <span class="detail-label">🔢 KERAKLI KAFEL:</span>
+            <span class="detail-value">${needed.toLocaleString()} ta</span>
+        </div>
+        <div class="detail-item" style="border-top:2px solid #3b82f6;padding-top:6px;margin-top:4px;">
+            <span class="detail-label">📐 2. 45° / Avalni metrlari:</span>
+            <span class="detail-value">${totalGradusTiles.toFixed(1)} ta</span>
+        </div>
+    `;
+    
+    gradusDetails.forEach(g => {
+        h += `
+            <div class="detail-item">
+                <span class="detail-label">  ${g.type} ${g.index}:</span>
+                <span class="detail-value">${g.meter} m × ${g.multiplier} = ${g.tiles.toFixed(1)} ta</span>
+            </div>
+        `;
+    });
+    
+    h += `
+        <div class="detail-item" style="font-weight:600;color:#eab308;">
+            <span class="detail-label">📦 ZAXIRA (${waste}%):</span>
+            <span class="detail-value">${extraPercent.toLocaleString()} ta</span>
+        </div>
+        <div class="detail-item" style="font-weight:700;border-top:2px solid #22c55e;padding-top:6px;margin-top:4px;background:#f0fdf4;">
+            <span class="detail-label">💎 JAMI KAFEL:</span>
+            <span class="detail-value">${totalTiles.toLocaleString()} ta</span>
+        </div>
+        <div class="detail-item" style="border-top:2px solid #3b82f6;padding-top:6px;margin-top:4px;">
+            <span class="detail-label">🧴 Kley sarfi (1 m²):</span>
+            <span class="detail-value">${gluePerM2} kg</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">🧴 1 xalta kley:</span>
+            <span class="detail-value">${GLUE_BAG_WEIGHT} kg</span>
+        </div>
+        <div class="detail-item" style="font-weight:700;border-top:2px solid #3b82f6;padding-top:6px;margin-top:4px;background:#eff6ff;">
+            <span class="detail-label">🧴 JAMI KLEY:</span>
+            <span class="detail-value">${glueBags} xalta (${totalGlue.toFixed(1)} kg) = ${glueTotal.toLocaleString('uz-UZ')} so'm</span>
+        </div>
+    `;
+    
+    document.getElementById('tileDetails').innerHTML = h;
+}
+
+// ====== 6. PNG HISOBOT YUKLASH ======
+function downloadCalcPNG() {
+    calculateTiles();
+    
+    const reportDiv = document.createElement('div');
+    reportDiv.style.cssText = 'padding:20px;background:#ffffff;border-radius:16px;max-width:600px;font-family:Segoe UI,system-ui,sans-serif;';
+    
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('uz-UZ', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+    const timeStr = now.toLocaleTimeString('uz-UZ', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    
+    reportDiv.innerHTML = `
+        <div style="text-align:center;padding-bottom:16px;border-bottom:2px solid #e2e8f0;margin-bottom:16px;">
+            <h1 style="font-size:24px;color:#0f172a;margin:0;">🧱 KAFEL HISOBI</h1>
+            <p style="color:#64748b;font-size:13px;margin:4px 0 0;">🏠 Uy egasi uchun hisob-kitob</p>
+            <p style="color:#94a3b8;font-size:12px;margin-top:4px;">📅 ${dateStr} | 🕒 ${timeStr}</p>
+        </div>
+        <div style="background:#f8fafc;border-radius:12px;padding:16px;border:2px dashed #dce3ec;">
+            ${document.getElementById('tileDetails').innerHTML}
+        </div>
+        <div style="margin-top:16px;padding-top:12px;border-top:2px solid #e2e8f0;text-align:center;font-size:11px;color:#94a3b8;">
+            🕒 Hisobot vaqti: ${timeStr}
+        </div>
+    `;
+    
+    document.body.appendChild(reportDiv);
+    
+    html2canvas(reportDiv, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        allowTaint: false,
+        useCORS: true,
+        logging: false,
+        borderRadius: '16px',
+        padding: 16
+    }).then((canvas) => {
+        const link = document.createElement('a');
+        const now2 = new Date();
+        link.download = `kafel_hisoboti_${now2.toISOString().slice(0,10)}.png`;
+        link.href = canvas.toDataURL('image/png');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        document.body.removeChild(reportDiv);
+    }).catch(function(err) {
+        alert('PNG yaratishda xatolik:\n' + err.message);
+        document.body.removeChild(reportDiv);
+    });
+}
+
+// ====== 7. AVTOMATIK HISOBLASH ======
+function setupCalcListeners() {
+    document.querySelectorAll('#tab-kalkulyator input, #tab-kalkulyator select').forEach(i => {
+        i.addEventListener('input', calculateTiles);
+        i.addEventListener('change', calculateTiles);
+    });
+    
+    // Area row labelni yangilash
+    document.querySelectorAll('#areaContainer .area-row').forEach(row => {
+        updateAreaLabels(row);
+    });
+}
+
+// ====== 8. BOSHLASH ======
+document.addEventListener('DOMContentLoaded', function() {
+    setupCalcListeners();
+    calculateTiles();
+    console.log('✅ Kalkulyator bo\'limi ishga tushdi!');
+});
+
+// ====== 9. GLOBAL FUNKSIYALAR ======
+window.addAreaRow = addAreaRow;
+window.removeAreaRow = removeAreaRow;
+window.addGradusRow = addGradusRow;
+window.removeGradusRow = removeGradusRow;
+window.addCalcGradusRow = addCalcGradusRow;
+window.removeCalcGradusRow = removeCalcGradusRow;
+window.calculateTiles = calculateTiles;
+window.downloadCalcPNG = downloadCalcPNG;
+window.updateAreaLabels = updateAreaLabels;
