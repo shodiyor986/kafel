@@ -26,8 +26,8 @@ const GLUE_BAG_WEIGHT = 25;
 const MIN_WASTE = 5;
 
 // ====== 4. HISOBLASH TURLARI ======
-let calcType = 'devor';      // 'devor' yoki 'yer'
-let calcGradusType = 'gradus'; // 'gradus' yoki 'avalni'
+let calcType = 'devor';
+let calcGradusType = 'gradus';
 
 // ====== 5. TANLASH FUNKSIYALARI ======
 function setCalcType(type) {
@@ -130,39 +130,24 @@ function calculateTiles() {
     // ===== KERAKLI KAFEL =====
     let needed = Math.ceil(netArea / tileArea);
     
-    // ===== 45 GRADUS YOKI AVALNI BO'YICHA QO'SHIMCHA =====
-    // 45 gradus: 1 metr = 2 ta kafel -> maydondan qat'iy nazar 2x
-    // Avalni: 1 metr = 1 ta kafel -> maydondan qat'iy nazar 1x
-    // Kafel sonini hisoblashda maydon asosida hisoblanadi, lekin
-    // qo'shimcha sifatida 45 gradus uchun yana 1x qo'shiladi
-    let extraMultiplier = 1;
+    // ===== 45 GRADUS YOKI AVALNI =====
     let gradusTypeName = '';
     let gradusTypeIcon = '';
+    let gradusExtraTiles = 0;
     
     if (calcGradusType === 'gradus') {
         // 45 gradus: qo'shimcha 1x (jami 2x)
-        extraMultiplier = 2;
+        gradusExtraTiles = needed;
         gradusTypeName = '45° Gradus';
         gradusTypeIcon = '🔶';
     } else {
         // Avalni: qo'shimcha 0 (jami 1x)
-        extraMultiplier = 1;
+        gradusExtraTiles = 0;
         gradusTypeName = 'Avalni (yon)';
         gradusTypeIcon = '🔷';
     }
     
-    // Kafel sonini hisoblash (maydon asosida)
-    let baseTiles = needed;
-    
-    // 45 gradus uchun qo'shimcha kafel (1x qo'shimcha)
-    let gradusExtraTiles = 0;
-    if (calcGradusType === 'gradus') {
-        // 45 gradusda har bir metr uchun 2x kafel kerak
-        // Maydondan kelib chiqib hisoblaymiz
-        gradusExtraTiles = needed; // 1x qo'shimcha
-    }
-    
-    // Jami kafel (asosiy + 45 gradus qo'shimchasi)
+    // ===== JAMI KAFEL (45° qo'shimchasi bilan) =====
     let totalTilesBeforeWaste = needed + gradusExtraTiles;
     
     // ===== QO'SHIMCHA FOIZ (ZAXIRA) =====
@@ -229,144 +214,4 @@ function calculateTiles() {
             <span class="detail-label">📐 Sof maydon:</span>
             <span class="detail-value">${netArea.toFixed(2)} m²</span>
         </div>
-        <div class="detail-item" style="border-top:2px solid #3b82f6;padding-top:6px;margin-top:4px;">
-            <span class="detail-label">📏 1 ta kafel maydoni:</span>
-            <span class="detail-value">${tileArea.toFixed(4)} m²</span>
-        </div>
-        <div class="detail-item" style="font-weight:700;color:#2563eb;">
-            <span class="detail-label">🔢 KERAKLI KAFEL:</span>
-            <span class="detail-value">${needed.toLocaleString()} ta</span>
-        </div>
-    `;
-    
-    if (calcGradusType === 'gradus') {
-        h += `
-            <div class="detail-item" style="font-weight:600;color:#ef4444;">
-                <span class="detail-label">🔶 45° QO'SHIMCHA (2x):</span>
-                <span class="detail-value">${gradusExtraTiles.toLocaleString()} ta</span>
-            </div>
-        `;
-    }
-    
-    h += `
-        <div class="detail-item" style="font-weight:600;color:#eab308;">
-            <span class="detail-label">📦 ZAXIRA (${waste}%):</span>
-            <span class="detail-value">${extraPercent.toLocaleString()} ta</span>
-        </div>
-        <div class="detail-item" style="font-weight:700;border-top:2px solid #22c55e;padding-top:6px;margin-top:4px;background:#f0fdf4;">
-            <span class="detail-label">💎 JAMI KAFEL:</span>
-            <span class="detail-value">${totalTiles.toLocaleString()} ta</span>
-        </div>
-        <div class="detail-item" style="border-top:2px solid #3b82f6;padding-top:6px;margin-top:4px;">
-            <span class="detail-label">🧴 Kley sarfi (1 m²):</span>
-            <span class="detail-value">${gluePerM2} kg</span>
-        </div>
-        <div class="detail-item">
-            <span class="detail-label">🧴 1 xalta kley:</span>
-            <span class="detail-value">${GLUE_BAG_WEIGHT} kg</span>
-        </div>
-        <div class="detail-item" style="font-weight:700;border-top:2px solid #3b82f6;padding-top:6px;margin-top:4px;background:#eff6ff;">
-            <span class="detail-label">🧴 JAMI KLEY:</span>
-            <span class="detail-value">${glueBags} xalta (${totalGlue.toFixed(1)} kg) = ${glueTotal.toLocaleString('uz-UZ')} so'm</span>
-        </div>
-    `;
-    
-    document.getElementById('tileDetails').innerHTML = h;
-}
-
-// ====== 8. PNG HISOBOT YUKLASH ======
-function downloadCalcPNG() {
-    calculateTiles();
-    
-    const reportDiv = document.createElement('div');
-    reportDiv.style.cssText = 'padding:20px;background:#ffffff;border-radius:16px;max-width:600px;font-family:Segoe UI,system-ui,sans-serif;';
-    
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('uz-UZ', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
-    const timeStr = now.toLocaleTimeString('uz-UZ', {
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-    const typeName = calcType === 'devor' ? '🧱 Devor' : '🟫 Yer (pol)';
-    const gradusName = calcGradusType === 'gradus' ? '🔶 45° Gradus' : '🔷 Avalni (yon)';
-    
-    reportDiv.innerHTML = `
-        <div style="text-align:center;padding-bottom:16px;border-bottom:2px solid #e2e8f0;margin-bottom:16px;">
-            <h1 style="font-size:24px;color:#0f172a;margin:0;">🧱 KAFEL HISOBI</h1>
-            <p style="color:#64748b;font-size:13px;margin:4px 0 0;">🏠 Uy egasi uchun hisob-kitob</p>
-            <p style="color:#94a3b8;font-size:12px;margin-top:4px;">📅 ${dateStr} | 🕒 ${timeStr}</p>
-            <p style="color:#3b82f6;font-size:14px;font-weight:600;margin-top:4px;">${typeName} | ${gradusName}</p>
-        </div>
-        <div style="background:#f8fafc;border-radius:12px;padding:16px;border:2px dashed #dce3ec;">
-            ${document.getElementById('tileDetails').innerHTML}
-        </div>
-        <div style="margin-top:16px;padding-top:12px;border-top:2px solid #e2e8f0;text-align:center;font-size:11px;color:#94a3b8;">
-            🕒 Hisobot vaqti: ${timeStr}
-        </div>
-    `;
-    
-    document.body.appendChild(reportDiv);
-    
-    html2canvas(reportDiv, {
-        scale: 2,
-        backgroundColor: '#ffffff',
-        allowTaint: false,
-        useCORS: true,
-        logging: false,
-        borderRadius: '16px',
-        padding: 16
-    }).then((canvas) => {
-        const link = document.createElement('a');
-        const now2 = new Date();
-        const typeName2 = calcType === 'devor' ? 'devor' : 'yer';
-        const gradusName2 = calcGradusType === 'gradus' ? '45gradus' : 'avalni';
-        link.download = `kafel_hisoboti_${typeName2}_${gradusName2}_${now2.toISOString().slice(0,10)}.png`;
-        link.href = canvas.toDataURL('image/png');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        document.body.removeChild(reportDiv);
-    }).catch(function(err) {
-        alert('PNG yaratishda xatolik:\n' + err.message);
-        document.body.removeChild(reportDiv);
-    });
-}
-
-// ====== 9. AVTOMATIK HISOBLASH ======
-function setupCalcListeners() {
-    document.querySelectorAll('#tab-kalkulyator input, #tab-kalkulyator select').forEach(i => {
-        i.addEventListener('input', calculateTiles);
-        i.addEventListener('change', calculateTiles);
-    });
-}
-
-// ====== 10. BOSHLASH ======
-document.addEventListener('DOMContentLoaded', function() {
-    setupCalcListeners();
-    
-    // Devor turi faollashtirilgan
-    document.querySelector('.calc-type .btn-option[data-type="devor"]')?.classList.add('active');
-    document.querySelector('.calc-gradus-type .btn-option[data-type="gradus"]')?.classList.add('active');
-    
-    const label = document.getElementById('heightLabel');
-    if (label) {
-        label.textContent = 'Balandlik (m)';
-    }
-    
-    calculateTiles();
-    console.log('✅ Kalkulyator bo\'limi ishga tushdi! (Devor, Yer, 45° va Avalni)');
-    console.log('📦 Minimal qo\'shimcha: ' + MIN_WASTE + '%');
-    console.log('🧴 1 xalta kley: ' + GLUE_BAG_WEIGHT + ' kg');
-});
-
-// ====== 11. GLOBAL FUNKSIYALAR ======
-window.setCalcType = setCalcType;
-window.setCalcGradusType = setCalcGradusType;
-window.addAreaRow = addAreaRow;
-window.removeAreaRow = removeAreaRow;
-window.calculateTiles = calculateTiles;
-window.downloadCalcPNG = downloadCalcPNG;
+        <div class="detail-item" style="border-top:2px solid #3b82f6;padding-top:6
