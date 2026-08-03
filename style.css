@@ -480,7 +480,8 @@ body {
 
 /* ===== TANLASH TUGMALARI ===== */
 .btn-group.calc-type,
-.btn-group.gradus-type {
+.btn-group.gradus-type,
+.btn-group.calc-gradus-type {
     display: flex;
     gap: 8px;
     background: var(--tg-theme-bg-color, #f1f5f9);
@@ -489,7 +490,8 @@ body {
 }
 
 .btn-group.calc-type .btn-option,
-.btn-group.gradus-type .btn-option {
+.btn-group.gradus-type .btn-option,
+.btn-group.calc-gradus-type .btn-option {
     flex: 1;
     padding: 10px 16px;
     border: none;
@@ -503,13 +505,15 @@ body {
 }
 
 .btn-group.calc-type .btn-option:hover,
-.btn-group.gradus-type .btn-option:hover {
+.btn-group.gradus-type .btn-option:hover,
+.btn-group.calc-gradus-type .btn-option:hover {
     color: var(--tg-theme-text-color, #1e293b);
     background: rgba(255, 255, 255, 0.4);
 }
 
 .btn-group.calc-type .btn-option.active,
-.btn-group.gradus-type .btn-option.active {
+.btn-group.gradus-type .btn-option.active,
+.btn-group.calc-gradus-type .btn-option.active {
     background: var(--tg-theme-secondary-bg-color, #ffffff);
     color: var(--tg-theme-text-color, #0f172a);
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
@@ -1183,12 +1187,14 @@ body {
     }
 
     .btn-group.calc-type,
-    .btn-group.gradus-type {
+    .btn-group.gradus-type,
+    .btn-group.calc-gradus-type {
         flex-direction: column;
     }
 
     .btn-group.calc-type .btn-option,
-    .btn-group.gradus-type .btn-option {
+    .btn-group.gradus-type .btn-option,
+    .btn-group.calc-gradus-type .btn-option {
         padding: 8px 12px;
         font-size: 13px;
     }
