@@ -1,7 +1,7 @@
 /**
  * ============================================
  * KALKULYATOR BO'LIMI - Kafel miqdorini hisoblash
- * Devor va Yer (pol) uchun, qo'shish funksiyasi va kley hisobi bilan
+ * Devor va Yer (pol) uchun, 45° Gradus va Avalni bilan
  * ============================================
  */
 
@@ -22,23 +22,31 @@ const GLUE_CONSUMPTION = {
 };
 
 // ====== 3. KONSTANTALAR ======
-const GLUE_BAG_WEIGHT = 25;  // 1 xalta = 25 kg
-const MIN_WASTE = 5;         // Minimal qo'shimcha foiz
+const GLUE_BAG_WEIGHT = 25;
+const MIN_WASTE = 5;
 
-// ====== 4. HISOBLASH TURI ======
-let calcType = 'devor'; // 'devor' yoki 'yer'
+// ====== 4. HISOBLASH TURLARI ======
+let calcType = 'devor';      // 'devor' yoki 'yer'
+let calcGradusType = 'gradus'; // 'gradus' yoki 'avalni'
 
-// ====== 5. TANLASH FUNKSIYASI ======
+// ====== 5. TANLASH FUNKSIYALARI ======
 function setCalcType(type) {
     calcType = type;
     document.querySelectorAll('.calc-type .btn-option').forEach(b => b.classList.remove('active'));
     document.querySelector(`.calc-type .btn-option[data-type="${type}"]`)?.classList.add('active');
     
-    // Balandlik/Kenglik labelini o'zgartirish
     const label = document.getElementById('heightLabel');
     if (label) {
         label.textContent = type === 'devor' ? 'Balandlik (m)' : 'Kenglik (m)';
     }
+    
+    calculateTiles();
+}
+
+function setCalcGradusType(type) {
+    calcGradusType = type;
+    document.querySelectorAll('.calc-gradus-type .btn-option').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.calc-gradus-type .btn-option[data-type="${type}"]`)?.classList.add('active');
     
     calculateTiles();
 }
@@ -88,7 +96,6 @@ function calculateTiles() {
     let waste = parseFloat(document.getElementById('wastePercent').value) || 0;
     const gluePrice = parseFloat(document.getElementById('gluePrice').value) || 0;
     
-    // Kafel ma'lumotlari
     const tile = TILE_SIZES[size];
     if (!tile) {
         alert("Kafel o'lchami topilmadi!");
@@ -117,21 +124,51 @@ function calculateTiles() {
         }
     });
     
-    // Eshik/deraza maydonini ayirish
     const netArea = Math.max(0, totalArea - sub);
-    
-    // Bir kafel maydoni
     const tileArea = tile.width * tile.height;
     
     // ===== KERAKLI KAFEL =====
-    const needed = Math.ceil(netArea / tileArea);
+    let needed = Math.ceil(netArea / tileArea);
     
-    // ===== QO'SHIMCHA KAFEL (kamida 5%) =====
+    // ===== 45 GRADUS YOKI AVALNI BO'YICHA QO'SHIMCHA =====
+    // 45 gradus: 1 metr = 2 ta kafel -> maydondan qat'iy nazar 2x
+    // Avalni: 1 metr = 1 ta kafel -> maydondan qat'iy nazar 1x
+    // Kafel sonini hisoblashda maydon asosida hisoblanadi, lekin
+    // qo'shimcha sifatida 45 gradus uchun yana 1x qo'shiladi
+    let extraMultiplier = 1;
+    let gradusTypeName = '';
+    let gradusTypeIcon = '';
+    
+    if (calcGradusType === 'gradus') {
+        // 45 gradus: qo'shimcha 1x (jami 2x)
+        extraMultiplier = 2;
+        gradusTypeName = '45° Gradus';
+        gradusTypeIcon = '🔶';
+    } else {
+        // Avalni: qo'shimcha 0 (jami 1x)
+        extraMultiplier = 1;
+        gradusTypeName = 'Avalni (yon)';
+        gradusTypeIcon = '🔷';
+    }
+    
+    // Kafel sonini hisoblash (maydon asosida)
+    let baseTiles = needed;
+    
+    // 45 gradus uchun qo'shimcha kafel (1x qo'shimcha)
+    let gradusExtraTiles = 0;
+    if (calcGradusType === 'gradus') {
+        // 45 gradusda har bir metr uchun 2x kafel kerak
+        // Maydondan kelib chiqib hisoblaymiz
+        gradusExtraTiles = needed; // 1x qo'shimcha
+    }
+    
+    // Jami kafel (asosiy + 45 gradus qo'shimchasi)
+    let totalTilesBeforeWaste = needed + gradusExtraTiles;
+    
+    // ===== QO'SHIMCHA FOIZ (ZAXIRA) =====
     waste = Math.max(waste, MIN_WASTE);
-    const extra = Math.ceil(needed * (waste / 100));
-    
-    // ===== JAMI KAFEL =====
-    const total = needed + extra;
+    const extraPercent = Math.ceil(totalTilesBeforeWaste * (waste / 100));
+    const totalTiles = totalTilesBeforeWaste + extraPercent;
     
     // ===== KLEY HISOBLASH =====
     const gluePerM2 = GLUE_CONSUMPTION[size] || 4.0;
@@ -143,11 +180,12 @@ function calculateTiles() {
     const typeName = calcType === 'devor' ? '🧱 Devor' : '🟫 Yer (pol)';
     
     document.getElementById('calcTypeDisplay').textContent = typeName;
+    document.getElementById('calcGradusTypeDisplay').textContent = gradusTypeIcon + ' ' + gradusTypeName;
     document.getElementById('tileArea').textContent = netArea.toFixed(2) + ' m²';
     document.getElementById('tileSingleArea').textContent = tileArea.toFixed(4) + ' m²';
     document.getElementById('tileCount').textContent = needed.toLocaleString() + ' ta';
-    document.getElementById('tileExtra').textContent = extra.toLocaleString() + ' ta (' + waste + '%)';
-    document.getElementById('tileTotal').textContent = total.toLocaleString() + ' ta';
+    document.getElementById('tileExtra').textContent = extraPercent.toLocaleString() + ' ta (' + waste + '%)';
+    document.getElementById('tileTotal').textContent = totalTiles.toLocaleString() + ' ta';
     document.getElementById('glueAmount').textContent = totalGlue.toFixed(1) + ' kg';
     document.getElementById('glueBags').textContent = glueBags + ' xalta';
     document.getElementById('glueTotalPrice').textContent = glueTotal.toLocaleString('uz-UZ') + " so'm";
@@ -156,8 +194,12 @@ function calculateTiles() {
     const hLabel = calcType === 'devor' ? 'Balandlik' : 'Kenglik';
     let h = `
         <div class="detail-item">
-            <span class="detail-label">📏 Hisoblash turi:</span>
+            <span class="detail-label">📏 Yuzaki turi:</span>
             <span class="detail-value">${typeName}</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">📏 Hisoblash turi:</span>
+            <span class="detail-value">${gradusTypeIcon} ${gradusTypeName}</span>
         </div>
         <div class="detail-item">
             <span class="detail-label">📏 Kafel o'lchami:</span>
@@ -169,7 +211,6 @@ function calculateTiles() {
         </div>
     `;
     
-    // Har bir maydon
     areas.forEach(a => {
         h += `
             <div class="detail-item">
@@ -196,13 +237,25 @@ function calculateTiles() {
             <span class="detail-label">🔢 KERAKLI KAFEL:</span>
             <span class="detail-value">${needed.toLocaleString()} ta</span>
         </div>
+    `;
+    
+    if (calcGradusType === 'gradus') {
+        h += `
+            <div class="detail-item" style="font-weight:600;color:#ef4444;">
+                <span class="detail-label">🔶 45° QO'SHIMCHA (2x):</span>
+                <span class="detail-value">${gradusExtraTiles.toLocaleString()} ta</span>
+            </div>
+        `;
+    }
+    
+    h += `
         <div class="detail-item" style="font-weight:600;color:#eab308;">
-            <span class="detail-label">📦 QO'SHIMCHA KAFEL (${waste}%):</span>
-            <span class="detail-value">${extra.toLocaleString()} ta</span>
+            <span class="detail-label">📦 ZAXIRA (${waste}%):</span>
+            <span class="detail-value">${extraPercent.toLocaleString()} ta</span>
         </div>
         <div class="detail-item" style="font-weight:700;border-top:2px solid #22c55e;padding-top:6px;margin-top:4px;background:#f0fdf4;">
             <span class="detail-label">💎 JAMI KAFEL:</span>
-            <span class="detail-value">${total.toLocaleString()} ta</span>
+            <span class="detail-value">${totalTiles.toLocaleString()} ta</span>
         </div>
         <div class="detail-item" style="border-top:2px solid #3b82f6;padding-top:6px;margin-top:4px;">
             <span class="detail-label">🧴 Kley sarfi (1 m²):</span>
@@ -225,7 +278,6 @@ function calculateTiles() {
 function downloadCalcPNG() {
     calculateTiles();
     
-    // Hisobot uchun vaqtinchalik div yaratish
     const reportDiv = document.createElement('div');
     reportDiv.style.cssText = 'padding:20px;background:#ffffff;border-radius:16px;max-width:600px;font-family:Segoe UI,system-ui,sans-serif;';
     
@@ -240,13 +292,14 @@ function downloadCalcPNG() {
         minute: '2-digit'
     });
     const typeName = calcType === 'devor' ? '🧱 Devor' : '🟫 Yer (pol)';
+    const gradusName = calcGradusType === 'gradus' ? '🔶 45° Gradus' : '🔷 Avalni (yon)';
     
     reportDiv.innerHTML = `
         <div style="text-align:center;padding-bottom:16px;border-bottom:2px solid #e2e8f0;margin-bottom:16px;">
             <h1 style="font-size:24px;color:#0f172a;margin:0;">🧱 KAFEL HISOBI</h1>
             <p style="color:#64748b;font-size:13px;margin:4px 0 0;">🏠 Uy egasi uchun hisob-kitob</p>
             <p style="color:#94a3b8;font-size:12px;margin-top:4px;">📅 ${dateStr} | 🕒 ${timeStr}</p>
-            <p style="color:#3b82f6;font-size:14px;font-weight:600;margin-top:4px;">${typeName}</p>
+            <p style="color:#3b82f6;font-size:14px;font-weight:600;margin-top:4px;">${typeName} | ${gradusName}</p>
         </div>
         <div style="background:#f8fafc;border-radius:12px;padding:16px;border:2px dashed #dce3ec;">
             ${document.getElementById('tileDetails').innerHTML}
@@ -270,7 +323,8 @@ function downloadCalcPNG() {
         const link = document.createElement('a');
         const now2 = new Date();
         const typeName2 = calcType === 'devor' ? 'devor' : 'yer';
-        link.download = `kafel_hisoboti_${typeName2}_${now2.toISOString().slice(0,10)}.png`;
+        const gradusName2 = calcGradusType === 'gradus' ? '45gradus' : 'avalni';
+        link.download = `kafel_hisoboti_${typeName2}_${gradusName2}_${now2.toISOString().slice(0,10)}.png`;
         link.href = canvas.toDataURL('image/png');
         document.body.appendChild(link);
         link.click();
@@ -296,21 +350,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Devor turi faollashtirilgan
     document.querySelector('.calc-type .btn-option[data-type="devor"]')?.classList.add('active');
+    document.querySelector('.calc-gradus-type .btn-option[data-type="gradus"]')?.classList.add('active');
     
-    // Balandlik labelini sozlash
     const label = document.getElementById('heightLabel');
     if (label) {
         label.textContent = 'Balandlik (m)';
     }
     
     calculateTiles();
-    console.log('✅ Kalkulyator bo\'limi ishga tushdi! (Devor va Yer)');
+    console.log('✅ Kalkulyator bo\'limi ishga tushdi! (Devor, Yer, 45° va Avalni)');
     console.log('📦 Minimal qo\'shimcha: ' + MIN_WASTE + '%');
     console.log('🧴 1 xalta kley: ' + GLUE_BAG_WEIGHT + ' kg');
 });
 
-// ====== 11. GLOBAL FUNKSIYALARNI OCHIQ QILISH ======
+// ====== 11. GLOBAL FUNKSIYALAR ======
 window.setCalcType = setCalcType;
+window.setCalcGradusType = setCalcGradusType;
 window.addAreaRow = addAreaRow;
 window.removeAreaRow = removeAreaRow;
 window.calculateTiles = calculateTiles;
