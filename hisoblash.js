@@ -2,6 +2,7 @@
  * ============================================
  * HISOBLASH BO'LIMI - Kvadrat va 45° Gradus / Avalni
  * 45° = 2x, Avalni = 1x
+ * Kvitansiyada 45° va Avalni chizmalari
  * ============================================
  */
 
@@ -230,8 +231,11 @@ function updateGradusVisual() {
     const gradusInfo = document.getElementById('gradusInfo');
     const totalLabel = document.getElementById('totalGradusLabel');
     const receiptTitle = document.getElementById('receiptGradusTitle');
+    const receiptBox = document.querySelector('.receipt-tile-box');
+    const receiptExplanation = document.getElementById('receiptExplanation');
     
     if (hasGradus) {
+        // 45° Gradus vizual
         title.textContent = '🔍 45° kesish va yopishtirish';
         tilesLabel.textContent = '🔪 Kesiladigan kafel:';
         totalLabel.textContent = '🔶 45° gradus:';
@@ -257,8 +261,7 @@ function updateGradusVisual() {
                 <p><span class="dot green"></span> 1 metr = 2 ta kafel</p>
             `;
         }
-        const receiptBox = document.querySelector('.receipt-tile-box');
-        const receiptExplanation = document.getElementById('receiptExplanation');
+        // Kvitansiya vizual - 45°
         if (receiptBox) {
             receiptBox.innerHTML = `
                 <div class="receipt-tile receipt-tile-1">
@@ -279,6 +282,7 @@ function updateGradusVisual() {
             `;
         }
     } else if (hasAvalni) {
+        // Avalni vizual
         title.textContent = '🔍 Avalni (yon tomonini silliqlash)';
         tilesLabel.textContent = '🔪 Silliqlanadigan kafel:';
         totalLabel.textContent = '🔷 Avalni (yon):';
@@ -299,13 +303,12 @@ function updateGradusVisual() {
                 <p><span class="dot green"></span> 1 metr = 1 ta kafel</p>
             `;
         }
-        const receiptBox = document.querySelector('.receipt-tile-box');
-        const receiptExplanation = document.getElementById('receiptExplanation');
+        // Kvitansiya vizual - Avalni
         if (receiptBox) {
             receiptBox.innerHTML = `
-                <div class="receipt-tile receipt-tile-1" style="background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%); border-color: #3b82f6;">
-                    <span>1</span>
-                    <div class="receipt-cut-line" style="background: #3b82f6;"></div>
+                <div class="receipt-tile" style="width:60px;height:60px;background:linear-gradient(135deg,#dbeafe 0%,#93c5fd 100%);border:3px solid #3b82f6;border-radius:8px;display:flex;align-items:center;justify-content:center;position:relative;font-weight:700;font-size:16px;color:#1e293b;">
+                    <span style="position:relative;z-index:1;background:rgba(255,255,255,0.85);padding:2px 6px;border-radius:6px;font-size:12px;">1</span>
+                    <div style="position:absolute;width:86px;height:3px;background:#3b82f6;transform:rotate(45deg);border-radius:4px;"></div>
                 </div>
             `;
         }
@@ -316,6 +319,7 @@ function updateGradusVisual() {
             `;
         }
     } else {
+        // Default - 45°
         title.textContent = '🔍 45° kesish va yopishtirish';
         tilesLabel.textContent = '🔪 Kesiladigan kafel:';
         totalLabel.textContent = '🔶 45° gradus:';
@@ -341,8 +345,6 @@ function updateGradusVisual() {
                 <p><span class="dot green"></span> 1 metr = 2 ta kafel</p>
             `;
         }
-        const receiptBox = document.querySelector('.receipt-tile-box');
-        const receiptExplanation = document.getElementById('receiptExplanation');
         if (receiptBox) {
             receiptBox.innerHTML = `
                 <div class="receipt-tile receipt-tile-1">
@@ -374,6 +376,8 @@ function calculateGradus() {
     let totalTiles = 0;
     let totalPrice = 0;
     let details = [];
+    let hasGradus = false;
+    let hasAvalni = false;
 
     rows.forEach((row, index) => {
         const select = row.querySelector('.gradus-type-select');
@@ -384,6 +388,9 @@ function calculateGradus() {
         const multiplier = (type === 'gradus') ? 2 : 1;
         const typeName = (type === 'gradus') ? '45° Gradus' : 'Avalni (yon)';
         const typeIcon = (type === 'gradus') ? '🔶' : '🔷';
+        
+        if (type === 'gradus') hasGradus = true;
+        else if (type === 'avalni') hasAvalni = true;
         
         if (meter > 0) {
             const tiles = meter * multiplier;
@@ -397,6 +404,7 @@ function calculateGradus() {
                 index: index + 1,
                 type: typeName,
                 typeIcon: typeIcon,
+                type: type,
                 meter: meter,
                 multiplier: multiplier,
                 tiles: tiles,
@@ -413,7 +421,9 @@ function calculateGradus() {
         meter: totalMeter,
         tiles: totalTiles,
         total: totalPrice,
-        details: details
+        details: details,
+        hasGradus: hasGradus,
+        hasAvalni: hasAvalni
     };
 }
 
@@ -443,7 +453,7 @@ function calculateAll() {
     updateReceipt(square, gradus, grand);
 }
 
-// ====== 8. KVITANSIYA ======
+// ====== 8. KVITANSIYA (CHIZMALAR BILAN) ======
 function updateReceipt(square, gradus, grand) {
     const now = new Date();
     const dateStr = now.toLocaleDateString('uz-UZ', {
@@ -477,22 +487,126 @@ function updateReceipt(square, gradus, grand) {
     squareHTML += `<div class="receipt-total-small">JAMI: ${square.total.toLocaleString('uz-UZ')} so'm</div>`;
     document.getElementById('receiptSquare').innerHTML = squareHTML;
 
-    // 45 Gradus / Avalni
+    // ===== 45 GRADUS / AVALNI (CHIZMA BILAN) =====
+    let titleText = '';
+    let iconText = '';
+    let diagramHTML = '';
+    
+    if (gradus.hasGradus && !gradus.hasAvalni) {
+        titleText = '🔶 2. 45° gradus hisoblash:';
+        iconText = '🔶';
+        diagramHTML = `
+            <div class="receipt-diagram">
+                <div class="receipt-tile-box">
+                    <div class="receipt-tile receipt-tile-1">
+                        <span>1</span>
+                        <div class="receipt-cut-line"></div>
+                    </div>
+                    <div class="receipt-tile receipt-tile-2">
+                        <span>2</span>
+                        <div class="receipt-cut-line"></div>
+                    </div>
+                </div>
+                <div class="receipt-tile-explanation">
+                    <p><span class="dot red"></span> 1-kafel 45° kesiladi</p>
+                    <p><span class="dot blue"></span> 2-kafel 45° kesiladi</p>
+                    <p><span class="dot green"></span> 1 metr = 2 ta kafel</p>
+                </div>
+            </div>
+        `;
+    } else if (gradus.hasAvalni && !gradus.hasGradus) {
+        titleText = '🔷 2. Avalni (yon) hisoblash:';
+        iconText = '🔷';
+        diagramHTML = `
+            <div class="receipt-diagram">
+                <div class="receipt-tile-box">
+                    <div class="receipt-tile" style="width:60px;height:60px;background:linear-gradient(135deg,#dbeafe 0%,#93c5fd 100%);border:3px solid #3b82f6;border-radius:8px;display:flex;align-items:center;justify-content:center;position:relative;font-weight:700;font-size:16px;color:#1e293b;">
+                        <span style="position:relative;z-index:1;background:rgba(255,255,255,0.85);padding:2px 6px;border-radius:6px;font-size:12px;">1</span>
+                        <div style="position:absolute;width:86px;height:3px;background:#3b82f6;transform:rotate(45deg);border-radius:4px;"></div>
+                    </div>
+                </div>
+                <div class="receipt-tile-explanation">
+                    <p><span class="dot blue"></span> 1-kafel yon tomoni silliqlanadi</p>
+                    <p><span class="dot green"></span> 1 metr = 1 ta kafel</p>
+                </div>
+            </div>
+        `;
+    } else if (gradus.hasGradus && gradus.hasAvalni) {
+        // Ikkala tur ham mavjud - 45° ustunlik qiladi
+        titleText = '🔶🔷 2. 45° gradus va Avalni hisoblash:';
+        iconText = '🔶🔷';
+        diagramHTML = `
+            <div class="receipt-diagram">
+                <div class="receipt-tile-box">
+                    <div class="receipt-tile receipt-tile-1">
+                        <span>1</span>
+                        <div class="receipt-cut-line"></div>
+                    </div>
+                    <div class="receipt-tile receipt-tile-2">
+                        <span>2</span>
+                        <div class="receipt-cut-line"></div>
+                    </div>
+                </div>
+                <div class="receipt-tile-explanation">
+                    <p><span class="dot red"></span> 1-kafel 45° kesiladi</p>
+                    <p><span class="dot blue"></span> 2-kafel 45° kesiladi</p>
+                    <p><span class="dot green"></span> 1 metr = 2 ta kafel</p>
+                </div>
+                <div style="margin-top:8px;padding-top:8px;border-top:1px dashed #e2e8f0;width:100%;text-align:center;font-size:12px;color:#94a3b8;">
+                    🔷 Avalni ham mavjud
+                </div>
+            </div>
+        `;
+    } else {
+        // Hech narsa yo'q - default 45°
+        titleText = '🔶 2. 45° gradus hisoblash:';
+        iconText = '🔶';
+        diagramHTML = `
+            <div class="receipt-diagram">
+                <div class="receipt-tile-box">
+                    <div class="receipt-tile receipt-tile-1">
+                        <span>1</span>
+                        <div class="receipt-cut-line"></div>
+                    </div>
+                    <div class="receipt-tile receipt-tile-2">
+                        <span>2</span>
+                        <div class="receipt-cut-line"></div>
+                    </div>
+                </div>
+                <div class="receipt-tile-explanation">
+                    <p><span class="dot red"></span> 1-kafel 45° kesiladi</p>
+                    <p><span class="dot blue"></span> 2-kafel 45° kesiladi</p>
+                    <p><span class="dot green"></span> 1 metr = 2 ta kafel</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    document.getElementById('receiptGradusTitle').textContent = titleText;
+
+    // Gradus tafsilotlari
     let gradusDetailsHTML = '';
     if (gradus.details.length === 0) {
         gradusDetailsHTML += '<div class="receipt-item" style="color:#94a3b8;">Ma\'lumot kiritilmagan</div>';
     } else {
         gradus.details.forEach(item => {
+            const typeDisplay = item.type === '45° Gradus' ? '🔶' : '🔷';
             gradusDetailsHTML += `
                 <div class="receipt-item">
-                    ${item.typeIcon} ${item.type} ${item.index}: ${item.text} → ${item.price.toLocaleString('uz-UZ')} so'm
+                    ${typeDisplay} ${item.type} ${item.index}: ${item.text} → ${item.price.toLocaleString('uz-UZ')} so'm
                 </div>
             `;
         });
     }
 
-    document.getElementById('gradusReceiptDetails').innerHTML = gradusDetailsHTML;
-    document.getElementById('gradusReceiptTotal').textContent = 'JAMI: ' + gradus.total.toLocaleString('uz-UZ') + " so'm";
+    // Kvitansiyaga chizma va tafsilotlarni qo'shish
+    const receiptGradus = document.getElementById('receiptGradus');
+    receiptGradus.innerHTML = `
+        <h4 id="receiptGradusTitle">${titleText}</h4>
+        ${diagramHTML}
+        <div id="gradusReceiptDetails">${gradusDetailsHTML}</div>
+        <div class="receipt-total-small" id="gradusReceiptTotal">JAMI: ${gradus.total.toLocaleString('uz-UZ')} so'm</div>
+    `;
 
     // Umumiy
     document.getElementById('receiptGrandTotal').textContent = grand.toLocaleString('uz-UZ') + " so'm";
@@ -619,6 +733,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ Hisoblash bo\'limi ishga tushdi!');
     console.log('📐 45° Gradus: 1 metr = 2 ta kafel');
     console.log('📐 Avalni: 1 metr = 1 ta kafel');
+    console.log('📐 Kvitansiyada 45° va Avalni chizmalari mavjud!');
 });
 
 document.addEventListener('keydown', function(e) {
