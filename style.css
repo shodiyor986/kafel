@@ -253,6 +253,7 @@ body {
     outline: none;
 }
 
+/* Devor joylashuvi */
 .wall-top { grid-column: 1 / 4; grid-row: 1; }
 .wall-side { grid-column: 1; grid-row: 2; }
 .wall-left { grid-column: 2; grid-row: 2; }
