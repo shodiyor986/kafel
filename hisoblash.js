@@ -55,6 +55,7 @@ function calculateSquare() {
     let totalArea = 0;
     let allDetails = [];
 
+    // Asosiy 5 ta devorni hisoblash
     walls.forEach(wall => {
         const length = parseFloat(document.querySelector(`.wall-input[data-wall="${wall}"][data-type="length"]`).value) || 0;
         const height = parseFloat(document.querySelector(`.wall-input[data-wall="${wall}"][data-type="height"]`).value) || 0;
@@ -74,6 +75,7 @@ function calculateSquare() {
         }
     });
 
+    // Qo'shimcha devorlarni hisoblash
     const extraWalls = document.querySelectorAll('.extra-wall');
     extraWalls.forEach((wall) => {
         const select = wall.querySelector('.extra-wall-selector');
@@ -234,6 +236,7 @@ function updateGradusVisual() {
     const receiptExplanation = document.getElementById('receiptExplanation');
     
     if (hasGradus) {
+        // 45° Gradus vizual
         title.textContent = '🔍 45° kesish va yopishtirish';
         tilesLabel.textContent = '🔪 Kesiladigan kafel:';
         totalLabel.textContent = '🔶 45° gradus:';
@@ -279,6 +282,7 @@ function updateGradusVisual() {
             `;
         }
     } else if (hasAvalni) {
+        // Avalni vizual
         title.textContent = '🔍 Avalni (yon tomonini silliqlash)';
         tilesLabel.textContent = '🔪 Silliqlanadigan kafel:';
         totalLabel.textContent = '🔷 Avalni (yon):';
@@ -305,8 +309,8 @@ function updateGradusVisual() {
                     <span>1</span>
                     <svg viewBox="0 0 80 80">
                         <rect x="5" y="5" width="70" height="70" rx="4" fill="url(#avalniGrad)" stroke="#3b82f6" stroke-width="2.5"/>
-                        <path d="M 40 5 Q 75 5 75 40" stroke="#ef4444" stroke-width="3" fill="none" stroke-linecap="round"/>
-                        <path d="M 75 40 Q 75 75 40 75" stroke="#ef4444" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        <path d="M 40 5 Q 75 5 75 40" class="arc-45"/>
+                        <path d="M 75 40 Q 75 75 40 75" class="arc-45"/>
                         <line x1="40" y1="5" x2="40" y2="15" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="3,3"/>
                         <line x1="75" y1="40" x2="65" y2="40" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="3,3"/>
                         <defs>
@@ -321,11 +325,12 @@ function updateGradusVisual() {
         }
         if (receiptExplanation) {
             receiptExplanation.innerHTML = `
-                <p><span class="dot blue"></span> 1-kafel yon tomoni aylana (yaxlitlanadi)</p>
+                <p><span class="dot blue"></span> 1-kafel yon tomoni aylana (45°) yaxlitlanadi</p>
                 <p><span class="dot green"></span> 1 metr = 1 ta kafel</p>
             `;
         }
     } else {
+        // Default - 45°
         title.textContent = '🔍 45° kesish va yopishtirish';
         tilesLabel.textContent = '🔪 Kesiladigan kafel:';
         totalLabel.textContent = '🔶 45° gradus:';
@@ -390,6 +395,7 @@ function calculateGradus() {
         const type = select ? select.value : 'gradus';
         const meter = parseFloat(row.querySelector('.gradus-meter-input').value) || 0;
         
+        // ===== MUHIM: 45° = 2x, Avalni = 1x =====
         const multiplier = (type === 'gradus') ? 2 : 1;
         const typeName = (type === 'gradus') ? '45° Gradus' : 'Avalni (yon)';
         const typeIcon = (type === 'gradus') ? '🔶' : '🔷';
@@ -474,7 +480,7 @@ function updateReceipt(square, gradus, grand) {
     document.getElementById('receiptDate').textContent = dateStr;
     document.getElementById('receiptTime').textContent = timeStr;
 
-    // Kvadrat
+    // ===== KVADRAT =====
     let squareHTML = '<h4>📐 1. Kvadrat hisoblash:</h4>';
     if (square.details.length === 0) {
         squareHTML += '<div class="receipt-item" style="color:#94a3b8;">Ma\'lumot kiritilmagan</div>';
@@ -536,7 +542,7 @@ function updateReceipt(square, gradus, grand) {
                 </div>
             `;
         } else if (gradus.hasAvalni && !gradus.hasGradus) {
-            // Faqat Avalni - aylana (yoy) chizma
+            // Faqat Avalni - 45° aylana (yoy) chizma
             titleText = '🔷 2. Avalni (yon) hisoblash:';
             diagramHTML = `
                 <div class="receipt-diagram">
@@ -545,8 +551,8 @@ function updateReceipt(square, gradus, grand) {
                             <span>1</span>
                             <svg viewBox="0 0 80 80">
                                 <rect x="5" y="5" width="70" height="70" rx="4" fill="url(#avalniGrad2)" stroke="#3b82f6" stroke-width="2.5"/>
-                                <path d="M 40 5 Q 75 5 75 40" stroke="#ef4444" stroke-width="3" fill="none" stroke-linecap="round"/>
-                                <path d="M 75 40 Q 75 75 40 75" stroke="#ef4444" stroke-width="3" fill="none" stroke-linecap="round"/>
+                                <path d="M 40 5 Q 75 5 75 40" class="arc-45"/>
+                                <path d="M 75 40 Q 75 75 40 75" class="arc-45"/>
                                 <line x1="40" y1="5" x2="40" y2="15" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="3,3"/>
                                 <line x1="75" y1="40" x2="65" y2="40" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="3,3"/>
                                 <defs>
@@ -559,7 +565,7 @@ function updateReceipt(square, gradus, grand) {
                         </div>
                     </div>
                     <div class="receipt-tile-explanation">
-                        <p><span class="dot blue"></span> 1-kafel yon tomoni aylana (yaxlitlanadi)</p>
+                        <p><span class="dot blue"></span> 1-kafel yon tomoni 45° aylana (yoy) yaxlitlanadi</p>
                         <p><span class="dot green"></span> 1 metr = 1 ta kafel</p>
                     </div>
                 </div>
@@ -595,8 +601,8 @@ function updateReceipt(square, gradus, grand) {
                             <span>1</span>
                             <svg viewBox="0 0 80 80">
                                 <rect x="5" y="5" width="70" height="70" rx="4" fill="url(#avalniGrad3)" stroke="#3b82f6" stroke-width="2.5"/>
-                                <path d="M 40 5 Q 75 5 75 40" stroke="#ef4444" stroke-width="3" fill="none" stroke-linecap="round"/>
-                                <path d="M 75 40 Q 75 75 40 75" stroke="#ef4444" stroke-width="3" fill="none" stroke-linecap="round"/>
+                                <path d="M 40 5 Q 75 5 75 40" class="arc-45"/>
+                                <path d="M 75 40 Q 75 75 40 75" class="arc-45"/>
                                 <line x1="40" y1="5" x2="40" y2="15" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="3,3"/>
                                 <line x1="75" y1="40" x2="65" y2="40" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="3,3"/>
                                 <defs>
@@ -609,7 +615,7 @@ function updateReceipt(square, gradus, grand) {
                         </div>
                     </div>
                     <div class="receipt-tile-explanation">
-                        <p><span class="dot blue"></span> 1-kafel yon tomoni aylana (yaxlitlanadi)</p>
+                        <p><span class="dot blue"></span> 1-kafel yon tomoni 45° aylana (yoy) yaxlitlanadi</p>
                         <p><span class="dot green"></span> 1 metr = 1 ta kafel</p>
                     </div>
                 </div>
