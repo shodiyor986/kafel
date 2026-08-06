@@ -160,9 +160,9 @@
                         <small id="gradusInfo">⚠️ 1 metr = 2 ta kafel 45° kesiladi</small>
                     </div>
 
-                    <!-- ===== METRLAR KONTEYNERI ===== -->
+                    <!-- ===== METRLAR KONTEYNERI (SANTIMETRDA KIRITISH) ===== -->
                     <div class="input-group">
-                        <label>📏 Metrlar</label>
+                        <label>📏 Metrlar (santimetrda)</label>
                         <div id="gradusContainer">
                             <div class="input-with-btn gradus-row">
                                 <div class="input-group-sm" style="flex:1.5;">
@@ -172,13 +172,14 @@
                                     </select>
                                 </div>
                                 <div class="input-group-sm" style="flex:1;">
-                                    <label>Metr (m)</label>
-                                    <input type="number" class="gradus-meter-input" value="1" step="0.1" min="0" />
+                                    <label>sm</label>
+                                    <input type="number" class="gradus-meter-input" value="100" step="1" min="0" />
                                 </div>
                                 <button class="btn-remove-row" onclick="removeGradusRow(this)">✖</button>
                             </div>
                         </div>
                         <button class="btn-add-row" onclick="addGradusRow()">➕ Qator qo'shish</button>
+                        <small>📌 Santimetrda kiriting (1 m = 100 sm)</small>
                     </div>
 
                     <!-- 45° VIZUAL -->
