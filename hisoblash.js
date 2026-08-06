@@ -2,7 +2,7 @@
  * ============================================
  * HISOBLASH BO'LIMI - Kvadrat va 45° Gradus / Avalni
  * 45° = 2x, Avalni = 1x
- * Santimetrda kiritish, metrda ko'rsatish
+ * Santimetrda kiritish (butun son), metrda ko'rsatish
  * ============================================
  */
 
@@ -56,9 +56,11 @@ function calculateSquare() {
     let allDetails = [];
 
     walls.forEach(wall => {
-        // Santimetrda kiritilgan qiymatlarni metrga o'tkazish
-        const lengthCm = parseFloat(document.querySelector(`.wall-input[data-wall="${wall}"][data-type="length"]`).value) || 0;
-        const heightCm = parseFloat(document.querySelector(`.wall-input[data-wall="${wall}"][data-type="height"]`).value) || 0;
+        // Santimetrda kiritilgan qiymatlarni butun son sifatida olish
+        const lengthCm = parseInt(document.querySelector(`.wall-input[data-wall="${wall}"][data-type="length"]`).value) || 0;
+        const heightCm = parseInt(document.querySelector(`.wall-input[data-wall="${wall}"][data-type="height"]`).value) || 0;
+        
+        // Santimetrni metrga o'tkazish (aniq hisoblash uchun)
         const length = lengthCm / 100;
         const height = heightCm / 100;
         const area = length * height;
@@ -85,8 +87,8 @@ function calculateSquare() {
         const select = wall.querySelector('.extra-wall-selector');
         const selectedText = select ? select.options[select.selectedIndex]?.text || "Qo'shimcha" : "Qo'shimcha";
 
-        const lengthCm = parseFloat(wall.querySelector('.extra-length').value) || 0;
-        const heightCm = parseFloat(wall.querySelector('.extra-height').value) || 0;
+        const lengthCm = parseInt(wall.querySelector('.extra-length').value) || 0;
+        const heightCm = parseInt(wall.querySelector('.extra-height').value) || 0;
         const length = lengthCm / 100;
         const height = heightCm / 100;
         const area = length * height;
@@ -398,7 +400,8 @@ function calculateGradus() {
     rows.forEach((row, index) => {
         const select = row.querySelector('.gradus-type-select');
         const type = select ? select.value : 'gradus';
-        const cmValue = parseFloat(row.querySelector('.gradus-meter-input').value) || 0;
+        // Santimetrda kiritilgan qiymatni butun son sifatida olish
+        const cmValue = parseInt(row.querySelector('.gradus-meter-input').value) || 0;
         const meter = cmValue / 100;
         
         const multiplier = (type === 'gradus') ? 2 : 1;
@@ -781,7 +784,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ Hisoblash bo\'limi ishga tushdi!');
     console.log('📐 45° Gradus: 1 metr = 2 ta kafel');
     console.log('📐 Avalni: 1 metr = 1 ta kafel');
-    console.log('📏 Santimetrda kiriting, metrda ko\'rsatiladi!');
+    console.log('📏 Santimetrda kiriting (butun son), metrda ko\'rsatiladi!');
 });
 
 document.addEventListener('keydown', function(e) {
