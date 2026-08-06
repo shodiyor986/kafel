@@ -223,7 +223,6 @@ function updateGradusVisual() {
         }
     });
     
-    const visualContainer = document.getElementById('visualContainer');
     const title = document.getElementById('visualTitle');
     const tileBox = document.getElementById('tileBox');
     const explanation = document.getElementById('tileExplanation');
@@ -235,7 +234,6 @@ function updateGradusVisual() {
     const receiptExplanation = document.getElementById('receiptExplanation');
     
     if (hasGradus) {
-        // 45° Gradus vizual
         title.textContent = '🔍 45° kesish va yopishtirish';
         tilesLabel.textContent = '🔪 Kesiladigan kafel:';
         totalLabel.textContent = '🔶 45° gradus:';
@@ -261,7 +259,6 @@ function updateGradusVisual() {
                 <p><span class="dot green"></span> 1 metr = 2 ta kafel</p>
             `;
         }
-        // Kvitansiya vizual - 45°
         if (receiptBox) {
             receiptBox.innerHTML = `
                 <div class="receipt-tile receipt-tile-1">
@@ -282,7 +279,6 @@ function updateGradusVisual() {
             `;
         }
     } else if (hasAvalni) {
-        // Avalni vizual
         title.textContent = '🔍 Avalni (yon tomonini silliqlash)';
         tilesLabel.textContent = '🔪 Silliqlanadigan kafel:';
         totalLabel.textContent = '🔷 Avalni (yon):';
@@ -303,23 +299,33 @@ function updateGradusVisual() {
                 <p><span class="dot green"></span> 1 metr = 1 ta kafel</p>
             `;
         }
-        // Kvitansiya vizual - Avalni
         if (receiptBox) {
             receiptBox.innerHTML = `
-                <div class="receipt-tile" style="width:60px;height:60px;background:linear-gradient(135deg,#dbeafe 0%,#93c5fd 100%);border:3px solid #3b82f6;border-radius:8px;display:flex;align-items:center;justify-content:center;position:relative;font-weight:700;font-size:16px;color:#1e293b;">
-                    <span style="position:relative;z-index:1;background:rgba(255,255,255,0.85);padding:2px 6px;border-radius:6px;font-size:12px;">1</span>
-                    <div style="position:absolute;width:86px;height:3px;background:#3b82f6;transform:rotate(45deg);border-radius:4px;"></div>
+                <div class="receipt-tile-avalni">
+                    <span>1</span>
+                    <svg viewBox="0 0 80 80">
+                        <rect x="5" y="5" width="70" height="70" rx="4" fill="url(#avalniGrad)" stroke="#3b82f6" stroke-width="2.5"/>
+                        <path d="M 40 5 Q 75 5 75 40" stroke="#ef4444" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        <path d="M 75 40 Q 75 75 40 75" stroke="#ef4444" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        <line x1="40" y1="5" x2="40" y2="15" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="3,3"/>
+                        <line x1="75" y1="40" x2="65" y2="40" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="3,3"/>
+                        <defs>
+                            <linearGradient id="avalniGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#dbeafe;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#93c5fd;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
                 </div>
             `;
         }
         if (receiptExplanation) {
             receiptExplanation.innerHTML = `
-                <p><span class="dot blue"></span> 1-kafel yon tomoni silliqlanadi</p>
+                <p><span class="dot blue"></span> 1-kafel yon tomoni aylana (yaxlitlanadi)</p>
                 <p><span class="dot green"></span> 1 metr = 1 ta kafel</p>
             `;
         }
     } else {
-        // Default - 45°
         title.textContent = '🔍 45° kesish va yopishtirish';
         tilesLabel.textContent = '🔪 Kesiladigan kafel:';
         totalLabel.textContent = '🔶 45° gradus:';
@@ -384,7 +390,6 @@ function calculateGradus() {
         const type = select ? select.value : 'gradus';
         const meter = parseFloat(row.querySelector('.gradus-meter-input').value) || 0;
         
-        // ===== MUHIM: 45° = 2x, Avalni = 1x =====
         const multiplier = (type === 'gradus') ? 2 : 1;
         const typeName = (type === 'gradus') ? '45° Gradus' : 'Avalni (yon)';
         const typeIcon = (type === 'gradus') ? '🔶' : '🔷';
@@ -492,7 +497,6 @@ function updateReceipt(square, gradus, grand) {
     let diagramHTML = '';
     let hasAnyData = false;
     
-    // Gradus tafsilotlari
     let gradusDetailsHTML = '';
     if (gradus.details.length === 0) {
         gradusDetailsHTML += '<div class="receipt-item" style="color:#94a3b8;">Ma\'lumot kiritilmagan</div>';
@@ -508,7 +512,6 @@ function updateReceipt(square, gradus, grand) {
         });
     }
 
-    // CHIZMA - faqat ma'lumot bo'lsa chiqadi
     if (hasAnyData) {
         if (gradus.hasGradus && !gradus.hasAvalni) {
             // Faqat 45° Gradus
@@ -533,24 +536,36 @@ function updateReceipt(square, gradus, grand) {
                 </div>
             `;
         } else if (gradus.hasAvalni && !gradus.hasGradus) {
-            // Faqat Avalni
+            // Faqat Avalni - aylana (yoy) chizma
             titleText = '🔷 2. Avalni (yon) hisoblash:';
             diagramHTML = `
                 <div class="receipt-diagram">
                     <div class="receipt-tile-box">
-                        <div class="receipt-tile" style="width:60px;height:60px;background:linear-gradient(135deg,#dbeafe 0%,#93c5fd 100%);border:3px solid #3b82f6;border-radius:8px;display:flex;align-items:center;justify-content:center;position:relative;font-weight:700;font-size:16px;color:#1e293b;">
-                            <span style="position:relative;z-index:1;background:rgba(255,255,255,0.85);padding:2px 6px;border-radius:6px;font-size:12px;">1</span>
-                            <div style="position:absolute;width:86px;height:3px;background:#3b82f6;transform:rotate(45deg);border-radius:4px;"></div>
+                        <div class="receipt-tile-avalni">
+                            <span>1</span>
+                            <svg viewBox="0 0 80 80">
+                                <rect x="5" y="5" width="70" height="70" rx="4" fill="url(#avalniGrad2)" stroke="#3b82f6" stroke-width="2.5"/>
+                                <path d="M 40 5 Q 75 5 75 40" stroke="#ef4444" stroke-width="3" fill="none" stroke-linecap="round"/>
+                                <path d="M 75 40 Q 75 75 40 75" stroke="#ef4444" stroke-width="3" fill="none" stroke-linecap="round"/>
+                                <line x1="40" y1="5" x2="40" y2="15" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="3,3"/>
+                                <line x1="75" y1="40" x2="65" y2="40" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="3,3"/>
+                                <defs>
+                                    <linearGradient id="avalniGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#dbeafe;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#93c5fd;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
                         </div>
                     </div>
                     <div class="receipt-tile-explanation">
-                        <p><span class="dot blue"></span> 1-kafel yon tomoni silliqlanadi</p>
+                        <p><span class="dot blue"></span> 1-kafel yon tomoni aylana (yaxlitlanadi)</p>
                         <p><span class="dot green"></span> 1 metr = 1 ta kafel</p>
                     </div>
                 </div>
             `;
         } else if (gradus.hasGradus && gradus.hasAvalni) {
-            // Ikkala tur ham mavjud - ikkalasini ham ko'rsatish
+            // Ikkala tur ham mavjud
             titleText = '🔶🔷 2. 45° gradus va Avalni hisoblash:';
             diagramHTML = `
                 <div class="receipt-diagram">
@@ -576,20 +591,32 @@ function updateReceipt(square, gradus, grand) {
                         🔷 Avalni (yon)
                     </div>
                     <div class="receipt-tile-box">
-                        <div class="receipt-tile" style="width:60px;height:60px;background:linear-gradient(135deg,#dbeafe 0%,#93c5fd 100%);border:3px solid #3b82f6;border-radius:8px;display:flex;align-items:center;justify-content:center;position:relative;font-weight:700;font-size:16px;color:#1e293b;">
-                            <span style="position:relative;z-index:1;background:rgba(255,255,255,0.85);padding:2px 6px;border-radius:6px;font-size:12px;">1</span>
-                            <div style="position:absolute;width:86px;height:3px;background:#3b82f6;transform:rotate(45deg);border-radius:4px;"></div>
+                        <div class="receipt-tile-avalni">
+                            <span>1</span>
+                            <svg viewBox="0 0 80 80">
+                                <rect x="5" y="5" width="70" height="70" rx="4" fill="url(#avalniGrad3)" stroke="#3b82f6" stroke-width="2.5"/>
+                                <path d="M 40 5 Q 75 5 75 40" stroke="#ef4444" stroke-width="3" fill="none" stroke-linecap="round"/>
+                                <path d="M 75 40 Q 75 75 40 75" stroke="#ef4444" stroke-width="3" fill="none" stroke-linecap="round"/>
+                                <line x1="40" y1="5" x2="40" y2="15" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="3,3"/>
+                                <line x1="75" y1="40" x2="65" y2="40" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="3,3"/>
+                                <defs>
+                                    <linearGradient id="avalniGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#dbeafe;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#93c5fd;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
                         </div>
                     </div>
                     <div class="receipt-tile-explanation">
-                        <p><span class="dot blue"></span> 1-kafel yon tomoni silliqlanadi</p>
+                        <p><span class="dot blue"></span> 1-kafel yon tomoni aylana (yaxlitlanadi)</p>
                         <p><span class="dot green"></span> 1 metr = 1 ta kafel</p>
                     </div>
                 </div>
             `;
         }
     } else {
-        // Hech narsa yo'q
+        // Hech narsa yo'q - default 45°
         titleText = '🔶 2. 45° gradus hisoblash:';
         diagramHTML = `
             <div class="receipt-diagram">
@@ -614,7 +641,6 @@ function updateReceipt(square, gradus, grand) {
     
     document.getElementById('receiptGradusTitle').textContent = titleText;
 
-    // Kvitansiyaga chizma va tafsilotlarni qo'shish
     const receiptGradus = document.getElementById('receiptGradus');
     receiptGradus.innerHTML = `
         <h4 id="receiptGradusTitle">${titleText}</h4>
@@ -623,7 +649,6 @@ function updateReceipt(square, gradus, grand) {
         <div class="receipt-total-small" id="gradusReceiptTotal">JAMI: ${gradus.total.toLocaleString('uz-UZ')} so'm</div>
     `;
 
-    // Umumiy
     document.getElementById('receiptGrandTotal').textContent = grand.toLocaleString('uz-UZ') + " so'm";
     document.getElementById('receipt').style.display = 'block';
 }
