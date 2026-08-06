@@ -2,7 +2,8 @@
  * ============================================
  * HISOBLASH BO'LIMI - Kvadrat va 45° Gradus / Avalni
  * 45° = 2x, Avalni = 1x
- * Santimetrda kiritish (butun son), metrda ko'rsatish
+ * Devor nomi qo'shish funksiyasi bilan
+ * Santimetrda kiritish, metrda ko'rsatish
  * ============================================
  */
 
@@ -32,18 +33,11 @@ try {
     console.log('⚠️ Telegram Web App mavjud emas');
 }
 
-// ====== 1. KVADRAT HISOBLASH (SANTIMETRDAN METRGA) ======
+// ====== 1. KVADRAT HISOBLASH (NOM BILAN) ======
 function calculateSquare() {
     const price = parseFloat(document.getElementById('squarePrice').value) || 0;
 
     const walls = ['top', 'right', 'left', 'bottom', 'side'];
-    const wallNames = {
-        top: 'YUQORI',
-        right: 'O\'NG',
-        left: 'CHAP',
-        bottom: 'PAST',
-        side: 'YON'
-    };
     const wallIcons = {
         top: '⬆',
         right: '➡',
@@ -56,11 +50,13 @@ function calculateSquare() {
     let allDetails = [];
 
     walls.forEach(wall => {
-        // Santimetrda kiritilgan qiymatlarni butun son sifatida olish
+        // Devor nomini olish
+        const nameInput = document.querySelector(`.wall-name[data-wall="${wall}"]`);
+        const wallName = nameInput ? nameInput.value.trim() || wall : wall;
+        
         const lengthCm = parseInt(document.querySelector(`.wall-input[data-wall="${wall}"][data-type="length"]`).value) || 0;
         const heightCm = parseInt(document.querySelector(`.wall-input[data-wall="${wall}"][data-type="height"]`).value) || 0;
         
-        // Santimetrni metrga o'tkazish (aniq hisoblash uchun)
         const length = lengthCm / 100;
         const height = heightCm / 100;
         const area = length * height;
@@ -68,8 +64,8 @@ function calculateSquare() {
         if (area > 0) {
             totalArea += area;
             allDetails.push({
-                label: wallNames[wall],
-                icon: wallIcons[wall],
+                label: wallName,
+                icon: wallIcons[wall] || '',
                 length: length,
                 height: height,
                 lengthCm: lengthCm,
@@ -84,8 +80,8 @@ function calculateSquare() {
     // Qo'shimcha devorlarni hisoblash
     const extraWalls = document.querySelectorAll('.extra-wall');
     extraWalls.forEach((wall) => {
-        const select = wall.querySelector('.extra-wall-selector');
-        const selectedText = select ? select.options[select.selectedIndex]?.text || "Qo'shimcha" : "Qo'shimcha";
+        const nameInput = wall.querySelector('.extra-wall-name');
+        const wallName = nameInput ? nameInput.value.trim() || "Qo'shimcha" : "Qo'shimcha";
 
         const lengthCm = parseInt(wall.querySelector('.extra-length').value) || 0;
         const heightCm = parseInt(wall.querySelector('.extra-height').value) || 0;
@@ -96,8 +92,8 @@ function calculateSquare() {
         if (area > 0) {
             totalArea += area;
             allDetails.push({
-                label: selectedText,
-                icon: '',
+                label: wallName,
+                icon: '📌',
                 length: length,
                 height: height,
                 lengthCm: lengthCm,
@@ -136,27 +132,21 @@ function calculateSquare() {
     };
 }
 
-// ====== 2. QO'SHIMCHA DEVOR ======
+// ====== 2. QO'SHIMCHA DEVOR (NOM BILAN) ======
 function addExtraWall() {
     const container = document.getElementById('extraWallsContainer');
     const div = document.createElement('div');
     div.className = 'extra-wall';
     div.innerHTML = `
-        <div class="extra-wall-select">
-            <select class="extra-wall-selector">
-                <option value="top">⬆ YUQORI</option>
-                <option value="right">➡ O'NG</option>
-                <option value="left">⬅ CHAP</option>
-                <option value="bottom">⬇ PAST</option>
-                <option value="side">↔ YON</option>
-                <option value="extra" selected>📌 Qo'shimcha</option>
-            </select>
+        <div class="extra-wall-name-group" style="flex:0.8;min-width:60px;">
+            <label>Nomi</label>
+            <input type="text" class="extra-wall-name" value="Qo'shimcha" placeholder="Nomi..." />
         </div>
-        <div class="input-group-sm">
+        <div class="input-group-sm" style="flex:1;">
             <label>Uzunlik (sm)</label>
             <input type="number" class="extra-length" value="100" step="1" min="0" />
         </div>
-        <div class="input-group-sm">
+        <div class="input-group-sm" style="flex:1;">
             <label>Balandlik (sm)</label>
             <input type="number" class="extra-height" value="250" step="1" min="0" />
         </div>
@@ -246,6 +236,7 @@ function updateGradusVisual() {
     const receiptExplanation = document.getElementById('receiptExplanation');
     
     if (hasGradus) {
+        // 45° Gradus vizual
         title.textContent = '🔍 45° kesish va yopishtirish';
         tilesLabel.textContent = '🔪 Kesiladigan kafel:';
         totalLabel.textContent = '🔶 45° gradus:';
@@ -291,6 +282,7 @@ function updateGradusVisual() {
             `;
         }
     } else if (hasAvalni) {
+        // Avalni vizual
         title.textContent = '🔍 Avalni (yon tomonini silliqlash)';
         tilesLabel.textContent = '🔪 Silliqlanadigan kafel:';
         totalLabel.textContent = '🔷 Avalni (yon):';
@@ -338,6 +330,7 @@ function updateGradusVisual() {
             `;
         }
     } else {
+        // Default - 45°
         title.textContent = '🔍 45° kesish va yopishtirish';
         tilesLabel.textContent = '🔪 Kesiladigan kafel:';
         totalLabel.textContent = '🔶 45° gradus:';
@@ -385,7 +378,7 @@ function updateGradusVisual() {
     }
 }
 
-// ====== 5. 45 GRADUS / AVALNI HISOBLASH (SANTIMETRDAN METRGA) ======
+// ====== 5. 45 GRADUS / AVALNI HISOBLASH ======
 function calculateGradus() {
     const price = parseFloat(document.getElementById('gradusPrice').value) || 0;
     const rows = document.querySelectorAll('#gradusContainer .gradus-row');
@@ -400,7 +393,6 @@ function calculateGradus() {
     rows.forEach((row, index) => {
         const select = row.querySelector('.gradus-type-select');
         const type = select ? select.value : 'gradus';
-        // Santimetrda kiritilgan qiymatni butun son sifatida olish
         const cmValue = parseInt(row.querySelector('.gradus-meter-input').value) || 0;
         const meter = cmValue / 100;
         
@@ -449,7 +441,7 @@ function calculateGradus() {
 
 // ====== 6. LISTENERLAR ======
 function addListeners() {
-    document.querySelectorAll('.wall-input, .extra-length, .extra-height, .gradus-meter-input, .extra-wall-selector, .gradus-type-select').forEach(i => {
+    document.querySelectorAll('.wall-input, .extra-length, .extra-height, .gradus-meter-input, .extra-wall-selector, .gradus-type-select, .wall-name, .extra-wall-name').forEach(i => {
         i.addEventListener('input', calculateAll);
         i.addEventListener('change', function() {
             if (this.classList.contains('gradus-type-select') || this.classList.contains('gradus-meter-input')) {
@@ -473,7 +465,7 @@ function calculateAll() {
     updateReceipt(square, gradus, grand);
 }
 
-// ====== 8. KVITANSIYA (METRDA KO'RSATISH) ======
+// ====== 8. KVITANSIYA (NOM BILAN) ======
 function updateReceipt(square, gradus, grand) {
     const now = new Date();
     const dateStr = now.toLocaleDateString('uz-UZ', {
@@ -489,7 +481,7 @@ function updateReceipt(square, gradus, grand) {
     document.getElementById('receiptDate').textContent = dateStr;
     document.getElementById('receiptTime').textContent = timeStr;
 
-    // ===== KVADRAT =====
+    // ===== KVADRAT (NOM BILAN) =====
     let squareHTML = '<h4>📐 1. Kvadrat hisoblash:</h4>';
     if (square.details.length === 0) {
         squareHTML += '<div class="receipt-item" style="color:#94a3b8;">Ma\'lumot kiritilmagan</div>';
@@ -529,6 +521,7 @@ function updateReceipt(square, gradus, grand) {
 
     if (hasAnyData) {
         if (gradus.hasGradus && !gradus.hasAvalni) {
+            // Faqat 45° Gradus
             titleText = '🔶 2. 45° gradus hisoblash:';
             diagramHTML = `
                 <div class="receipt-diagram">
@@ -550,6 +543,7 @@ function updateReceipt(square, gradus, grand) {
                 </div>
             `;
         } else if (gradus.hasAvalni && !gradus.hasGradus) {
+            // Faqat Avalni
             titleText = '🔷 2. Avalni (yon) hisoblash:';
             diagramHTML = `
                 <div class="receipt-diagram">
@@ -578,6 +572,7 @@ function updateReceipt(square, gradus, grand) {
                 </div>
             `;
         } else if (gradus.hasGradus && gradus.hasAvalni) {
+            // Ikkala tur ham mavjud
             titleText = '🔶🔷 2. 45° gradus va Avalni hisoblash:';
             diagramHTML = `
                 <div class="receipt-diagram">
@@ -628,6 +623,7 @@ function updateReceipt(square, gradus, grand) {
             `;
         }
     } else {
+        // Hech narsa yo'q - default 45°
         titleText = '🔶 2. 45° gradus hisoblash:';
         diagramHTML = `
             <div class="receipt-diagram">
@@ -785,6 +781,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('📐 45° Gradus: 1 metr = 2 ta kafel');
     console.log('📐 Avalni: 1 metr = 1 ta kafel');
     console.log('📏 Santimetrda kiriting (butun son), metrda ko\'rsatiladi!');
+    console.log('📝 Devor nomini o\'zgartirishingiz mumkin!');
 });
 
 document.addEventListener('keydown', function(e) {
