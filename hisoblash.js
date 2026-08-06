@@ -32,7 +32,7 @@ try {
     console.log('⚠️ Telegram Web App mavjud emas');
 }
 
-// ====== 1. KVADRAT HISOBLASH ======
+// ====== 1. KVADRAT HISOBLASH (SANTIMETRDAN METRGA) ======
 function calculateSquare() {
     const price = parseFloat(document.getElementById('squarePrice').value) || 0;
 
@@ -56,8 +56,11 @@ function calculateSquare() {
     let allDetails = [];
 
     walls.forEach(wall => {
-        const length = parseFloat(document.querySelector(`.wall-input[data-wall="${wall}"][data-type="length"]`).value) || 0;
-        const height = parseFloat(document.querySelector(`.wall-input[data-wall="${wall}"][data-type="height"]`).value) || 0;
+        // Santimetrda kiritilgan qiymatlarni metrga o'tkazish
+        const lengthCm = parseFloat(document.querySelector(`.wall-input[data-wall="${wall}"][data-type="length"]`).value) || 0;
+        const heightCm = parseFloat(document.querySelector(`.wall-input[data-wall="${wall}"][data-type="height"]`).value) || 0;
+        const length = lengthCm / 100;
+        const height = heightCm / 100;
         const area = length * height;
 
         if (area > 0) {
@@ -67,6 +70,8 @@ function calculateSquare() {
                 icon: wallIcons[wall],
                 length: length,
                 height: height,
+                lengthCm: lengthCm,
+                heightCm: heightCm,
                 area: area,
                 price: area * price,
                 isExtra: false
@@ -74,13 +79,16 @@ function calculateSquare() {
         }
     });
 
+    // Qo'shimcha devorlarni hisoblash
     const extraWalls = document.querySelectorAll('.extra-wall');
     extraWalls.forEach((wall) => {
         const select = wall.querySelector('.extra-wall-selector');
         const selectedText = select ? select.options[select.selectedIndex]?.text || "Qo'shimcha" : "Qo'shimcha";
 
-        const length = parseFloat(wall.querySelector('.extra-length').value) || 0;
-        const height = parseFloat(wall.querySelector('.extra-height').value) || 0;
+        const lengthCm = parseFloat(wall.querySelector('.extra-length').value) || 0;
+        const heightCm = parseFloat(wall.querySelector('.extra-height').value) || 0;
+        const length = lengthCm / 100;
+        const height = heightCm / 100;
         const area = length * height;
 
         if (area > 0) {
@@ -90,6 +98,8 @@ function calculateSquare() {
                 icon: '',
                 length: length,
                 height: height,
+                lengthCm: lengthCm,
+                heightCm: heightCm,
                 area: area,
                 price: area * price,
                 isExtra: true
@@ -109,7 +119,7 @@ function calculateSquare() {
         allDetails.forEach(item => {
             detailsHTML += `
                 <div class="detail-item">
-                    <span class="detail-label">${item.icon} ${item.label}${item.isExtra ? ' 📌' : ''}: ${item.length} × ${item.height} = ${item.area.toFixed(2)} m²</span>
+                    <span class="detail-label">${item.icon} ${item.label}${item.isExtra ? ' 📌' : ''}: ${item.lengthCm} sm × ${item.heightCm} sm = ${item.area.toFixed(2)} m²</span>
                     <span class="detail-value">${item.price.toLocaleString('uz-UZ')} so'm</span>
                 </div>
             `;
@@ -141,12 +151,12 @@ function addExtraWall() {
             </select>
         </div>
         <div class="input-group-sm">
-            <label>Uzunlik</label>
-            <input type="number" class="extra-length" value="1" step="0.1" min="0" />
+            <label>Uzunlik (sm)</label>
+            <input type="number" class="extra-length" value="100" step="1" min="0" />
         </div>
         <div class="input-group-sm">
-            <label>Balandlik</label>
-            <input type="number" class="extra-height" value="2.5" step="0.1" min="0" />
+            <label>Balandlik (sm)</label>
+            <input type="number" class="extra-height" value="250" step="1" min="0" />
         </div>
         <button class="btn-remove-row" onclick="removeExtraWall(this)">✖</button>
     `;
@@ -388,7 +398,6 @@ function calculateGradus() {
     rows.forEach((row, index) => {
         const select = row.querySelector('.gradus-type-select');
         const type = select ? select.value : 'gradus';
-        // Santimetrda kiritilgan qiymatni metrga o'tkazish
         const cmValue = parseFloat(row.querySelector('.gradus-meter-input').value) || 0;
         const meter = cmValue / 100;
         
@@ -487,7 +496,7 @@ function updateReceipt(square, gradus, grand) {
             const extra = item.isExtra ? ' 📌' : '';
             squareHTML += `
                 <div class="receipt-item">
-                    ${icon} ${item.label}${extra}: ${item.length} × ${item.height} = ${item.area.toFixed(2)} m² → ${item.price.toLocaleString('uz-UZ')} so'm
+                    ${icon} ${item.label}${extra}: ${item.lengthCm} sm × ${item.heightCm} sm = ${item.area.toFixed(2)} m² → ${item.price.toLocaleString('uz-UZ')} so'm
                 </div>
             `;
         });
@@ -507,7 +516,6 @@ function updateReceipt(square, gradus, grand) {
         hasAnyData = true;
         gradus.details.forEach(item => {
             const typeDisplay = item.type === 'gradus' ? '🔶' : '🔷';
-            // Kvitansiyada metrda ko'rsatish
             gradusDetailsHTML += `
                 <div class="receipt-item">
                     ${typeDisplay} ${item.typeName} ${item.index}: ${item.cmValue} sm (${item.meter.toFixed(2)} m) × ${item.multiplier} = ${item.tiles.toFixed(1)} ta kafel → ${item.price.toLocaleString('uz-UZ')} so'm
